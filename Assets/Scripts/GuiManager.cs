@@ -19,8 +19,27 @@ public class GuiManager : MonoBehaviour
 
     public Button SetButton;
 
+    public static GuiManager Singelton;
+
     public bool successfulIP = false;
     public bool successfulPort = false;
+
+    GuiManager()
+    {
+        Singelton = this;
+    }
+
+    public void enableIpInput(bool yes)
+    {
+        foreach (Button b in StartButtons)
+        {
+            b.interactable = !(yes);
+        }
+
+        SetButton.interactable =
+        ipAdress.interactable =
+        portt.interactable = yes;
+    }
 
     public void setIP()
     {
