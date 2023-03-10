@@ -15,7 +15,7 @@ C:/Users/denni/OneDrive/Desktop/Unity/OnlineRPGJR/UnlineRPGJR
 -logFile
 Logs/AssetImportWorker3.log
 -srvPort
-51005
+51060
 Successfully changed project path to: C:/Users/denni/OneDrive/Desktop/Unity/OnlineRPGJR/UnlineRPGJR
 C:/Users/denni/OneDrive/Desktop/Unity/OnlineRPGJR/UnlineRPGJR
 [UnityMemory] Configuration Parameters - Can be set up in boot.config
@@ -47,11 +47,11 @@ C:/Users/denni/OneDrive/Desktop/Unity/OnlineRPGJR/UnlineRPGJR
     "memorysetup-temp-allocator-size-cloud-worker=32768"
     "memorysetup-temp-allocator-size-gi-baking-worker=262144"
     "memorysetup-temp-allocator-size-gfx=262144"
-Player connection [23236] Host "[IP] 25.45.90.129 [Port] 0 [Flags] 2 [Guid] 1364744670 [EditorId] 1364744670 [Version] 1048832 [Id] WindowsEditor(7,LAPTOP-JV3EJRGA) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" joined multi-casting on [225.0.0.222:54997]...
+Player connection [21328] Host "[IP] 25.45.90.129 [Port] 0 [Flags] 2 [Guid] 3978720693 [EditorId] 3978720693 [Version] 1048832 [Id] WindowsEditor(7,LAPTOP-JV3EJRGA) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" joined multi-casting on [225.0.0.222:54997]...
 
-Player connection [23236] Host "[IP] 25.45.90.129 [Port] 0 [Flags] 2 [Guid] 1364744670 [EditorId] 1364744670 [Version] 1048832 [Id] WindowsEditor(7,LAPTOP-JV3EJRGA) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" joined alternative multi-casting on [225.0.0.222:34997]...
+Player connection [21328] Host "[IP] 25.45.90.129 [Port] 0 [Flags] 2 [Guid] 3978720693 [EditorId] 3978720693 [Version] 1048832 [Id] WindowsEditor(7,LAPTOP-JV3EJRGA) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" joined alternative multi-casting on [225.0.0.222:34997]...
 
-Refreshing native plugins compatible for Editor in 387.66 ms, found 4 plugins.
+Refreshing native plugins compatible for Editor in 302.31 ms, found 4 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 2021.3.18f1 (3129e69bc0c7)
 [Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2021.3.18f1/Editor/Data/Resources/UnitySubsystems
@@ -67,7 +67,7 @@ Initialize mono
 Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2021.3.18f1/Editor/Data/Managed'
 Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2021.3.18f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
 Mono config path = 'C:/Program Files/Unity/Hub/Editor/2021.3.18f1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56528
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56776
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2021.3.18f1/Editor/Data/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll
@@ -78,7 +78,7 @@ Register platform support module: C:/Program Files/Unity/Hub/Editor/2021.3.18f1/
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2021.3.18f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2021.3.18f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/UnityEditor.LinuxStandalone.Extensions.dll
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2021.3.18f1/Editor/Data/PlaybackEngines/MetroSupport/UnityEditor.UWP.Extensions.dll
-Registered in 0.037218 seconds.
+Registered in 0.031222 seconds.
 Native extension for UWP target not found
 Native extension for LinuxStandalone target not found
 Native extension for WindowsStandalone target not found
@@ -89,148 +89,39 @@ Native extension for AppleTV target not found
 [usbmuxd] Listen thread started
 Native extension for iOS target not found
 Native extension for Android target not found
-Android Extension - Scanning For ADB Devices 626 ms
+Android Extension - Scanning For ADB Devices 532 ms
 Native extension for OSXStandalone target not found
 Native extension for WebGL target not found
-Refreshing native plugins compatible for Editor in 328.04 ms, found 4 plugins.
+Refreshing native plugins compatible for Editor in 327.36 ms, found 4 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  2.472 seconds
+- Completed reload, in  2.319 seconds
 Domain Reload Profiling:
-	ReloadAssembly (2474ms)
-		BeginReloadAssembly (190ms)
+	ReloadAssembly (2320ms)
+		BeginReloadAssembly (270ms)
 			ExecutionOrderSort (0ms)
 			DisableScriptedObjects (0ms)
 			BackupInstance (0ms)
 			ReleaseScriptingObjects (0ms)
-			CreateAndSetChildDomain (2ms)
-		EndReloadAssembly (1987ms)
-			LoadAssemblies (188ms)
+			CreateAndSetChildDomain (1ms)
+		EndReloadAssembly (1794ms)
+			LoadAssemblies (268ms)
 			RebuildTransferFunctionScriptingTraits (0ms)
-			SetupTypeCache (263ms)
+			SetupTypeCache (236ms)
 			ReleaseScriptCaches (0ms)
-			RebuildScriptCaches (58ms)
-			SetupLoadedEditorAssemblies (1528ms)
+			RebuildScriptCaches (48ms)
+			SetupLoadedEditorAssemblies (1388ms)
 				LogAssemblyErrors (0ms)
-				InitializePlatformSupportModulesInManaged (882ms)
+				InitializePlatformSupportModulesInManaged (754ms)
 				SetLoadedEditorAssemblies (1ms)
 				RefreshPlugins (328ms)
-				BeforeProcessingInitializeOnLoad (3ms)
-				ProcessInitializeOnLoadAttributes (212ms)
-				ProcessInitializeOnLoadMethodAttributes (101ms)
+				BeforeProcessingInitializeOnLoad (4ms)
+				ProcessInitializeOnLoadAttributes (199ms)
+				ProcessInitializeOnLoadMethodAttributes (103ms)
 				AfterProcessingInitializeOnLoad (0ms)
 				EditorAssembliesLoaded (0ms)
 			ExecutionOrderSort2 (0ms)
 			AwakeInstancesAfterBackupRestoration (0ms)
 Platform modules already initialized, skipping
 Registering precompiled user dll's ...
-Registered in 0.031333 seconds.
-Begin MonoManager ReloadAssembly
-Symbol file LoadedFromMemory doesn't match image C:\Users\denni\OneDrive\Desktop\Unity\OnlineRPGJR\UnlineRPGJR\Library\PackageCache\com.unity.visualscripting@1.8.0\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll
-Symbol file LoadedFromMemory doesn't match image C:\Users\denni\OneDrive\Desktop\Unity\OnlineRPGJR\UnlineRPGJR\Library\PackageCache\com.unity.visualscripting@1.8.0\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll
-Native extension for UWP target not found
-Native extension for LinuxStandalone target not found
-Native extension for WindowsStandalone target not found
-Native extension for AppleTV target not found
-Native extension for iOS target not found
-Native extension for Android target not found
-Native extension for OSXStandalone target not found
-Native extension for WebGL target not found
-Refreshing native plugins compatible for Editor in 416.02 ms, found 4 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  3.812 seconds
-Domain Reload Profiling:
-	ReloadAssembly (3814ms)
-		BeginReloadAssembly (275ms)
-			ExecutionOrderSort (0ms)
-			DisableScriptedObjects (12ms)
-			BackupInstance (0ms)
-			ReleaseScriptingObjects (0ms)
-			CreateAndSetChildDomain (45ms)
-		EndReloadAssembly (3222ms)
-			LoadAssemblies (266ms)
-			RebuildTransferFunctionScriptingTraits (0ms)
-			SetupTypeCache (761ms)
-			ReleaseScriptCaches (1ms)
-			RebuildScriptCaches (177ms)
-			SetupLoadedEditorAssemblies (1837ms)
-				LogAssemblyErrors (0ms)
-				InitializePlatformSupportModulesInManaged (107ms)
-				SetLoadedEditorAssemblies (0ms)
-				RefreshPlugins (416ms)
-				BeforeProcessingInitializeOnLoad (456ms)
-				ProcessInitializeOnLoadAttributes (601ms)
-				ProcessInitializeOnLoadMethodAttributes (232ms)
-				AfterProcessingInitializeOnLoad (24ms)
-				EditorAssembliesLoaded (0ms)
-			ExecutionOrderSort2 (0ms)
-			AwakeInstancesAfterBackupRestoration (12ms)
-Platform modules already initialized, skipping
-========================================================================
-Worker process is ready to serve import requests
-Launched and connected shader compiler UnityShaderCompiler.exe after 0.12 seconds
-Refreshing native plugins compatible for Editor in 2.33 ms, found 4 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 6122 Unused Serialized files (Serialized files now loaded: 0)
-Unloading 63 unused Assets / (1.3 MB). Loaded Objects now: 6556.
-Memory consumption went from 253.8 MB to 252.6 MB.
-Total: 9.009200 ms (FindLiveObjects: 1.155500 ms CreateObjectMapping: 0.528800 ms MarkObjects: 6.472600 ms  DeleteObjects: 0.850000 ms)
-
-AssetImportParameters requested are different than current active one (requested -> active):
-  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
-  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
-  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
-  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
-  custom:video-codec-MediaFoundation-h265: 746d11721c4dcdbdad8f713fa42b33f4 -> 
-  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
-  custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
-  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
-  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
-  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
-========================================================================
-Received Import Request.
-  Time since last request: 2463236.189217 seconds.
-  path: Assets/tilesets/TestBase/tilset_1.asset
-  artifactKey: Guid(0c7e91b3584086c4bb2394f5b49e36e8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/tilesets/TestBase/tilset_1.asset using Guid(0c7e91b3584086c4bb2394f5b49e36e8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ceb50af3a3bd4e6b50c5a0db67d1448f') in 0.217496 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.000058 seconds.
-  path: Assets/tilesets/TestBase/tilset_6.asset
-  artifactKey: Guid(bab658975355c9b468c2700366ee861e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/tilesets/TestBase/tilset_6.asset using Guid(bab658975355c9b468c2700366ee861e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0ad5a0dcd9f0d599950a9f908b015c37') in 0.020979 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.000062 seconds.
-  path: Assets/tilesets/TestBase/tilset_7.asset
-  artifactKey: Guid(033783f9f22c058429bb65aed2820f48) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/tilesets/TestBase/tilset_7.asset using Guid(033783f9f22c058429bb65aed2820f48) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '939bc6a355f27e1ec477b30fb6bfda86') in 0.019879 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.000046 seconds.
-  path: Assets/tilesets/TestBase/tilset_15.asset
-  artifactKey: Guid(2e4097b08be39c041989978b8a35a8a7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/tilesets/TestBase/tilset_15.asset using Guid(2e4097b08be39c041989978b8a35a8a7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '54d3371ea946b66311cab30144c34693') in 0.020631 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.000062 seconds.
-  path: Assets/tilesets/TestBase/tilset_4.asset
-  artifactKey: Guid(440908cbec54d9342b89becb6e1a13f6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/tilesets/TestBase/tilset_4.asset using Guid(440908cbec54d9342b89becb6e1a13f6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ff71dd8966cf96e501f7fe3c86a9754d') in 0.021225 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.000044 seconds.
-  path: Assets/tilesets/TestBase/tilset_14.asset
-  artifactKey: Guid(d260ea78b6828d144ad8b6c440a34d63) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/tilesets/TestBase/tilset_14.asset using Guid(d260ea78b6828d144ad8b6c440a34d63) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '61dbb4fb518f168fdb761ff78e658e8d') in 0.022957 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.000047 seconds.
-  path: Assets/tilesets/TestBase/tilset_9.asset
-  artifactKey: Guid(2c7e07bbd00a3844c9ea5d46e31d5e4c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/tilesets/TestBase/tilset_9.asset using Guid(2c7e07bbd00a3844c9ea5d46e31d5e4c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '241ecdca4d52597d6c5fc3bdad1e24f3') in 0.021030 seconds 
-Editor requested this worker to shutdown with reason: Scaling down because of idle timeout
-AssetImportWorker is now disconnected from the server
-Process exiting
-Exiting without the bug reporter. Application will terminate with return code 0
+Registered in 0.028270 seconds.
