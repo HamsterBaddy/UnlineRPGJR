@@ -48,10 +48,6 @@ public class PlayerMovement : NetworkBehaviour
 			{
 				jumped.Value = 61;
 			}
-
-			//oppositeForce = -rb.velocity.normalized * drag;
-
-			//setMoveInput_ServerRpc(moveinput.Value, NetworkObjectId);
 		}
 	}
 
@@ -67,58 +63,17 @@ public class PlayerMovement : NetworkBehaviour
 
 		if (notSlide.Value)
 		{
-			rb.velocity = new Vector2(0, 0);
+			rb.velocity = new Vector2(0, rb.velocity.y);
 		}
 
-		if (!side.Value)
+		rb.AddForce(new Vector2(moveinput.Value.x * speed.Value, 0));
+
+		rb.velocity = new Vector2(Math.Sign(rb.velocity.x) * Math.Min(maxSpeed.Value.x, Math.Abs(rb.velocity.x)), rb.velocity.y);
+
+		if (jumped.Value > 0 && jumped.Value <= maxJumped.Value)
 		{
-			rb.AddForce(moveinput.Value * speed.Value);
-
-
-			rb.velocity = new Vector2(Math.Sign(rb.velocity.x) * Math.Min(maxSpeed.Value.x, Math.Abs(rb.velocity.x)),
-									  Math.Sign(rb.velocity.y) * Math.Min(maxSpeed.Value.y, Math.Abs(rb.velocity.y)));
-		}
-		else
-		{
-			rb.AddForce(new Vector2(moveinput.Value.x * speed.Value, 0));
-
-			rb.velocity = new Vector2(Math.Sign(rb.velocity.x) * Math.Min(maxSpeed.Value.x, Math.Abs(rb.velocity.x)), rb.velocity.y);
-
-			if (jumped.Value > 0 && jumped.Value <= maxJumped.Value)
-			{
-				rb.AddForce(new Vector2(0, jumpStrengh.Value));
-				jumped.Value += 1;
-			}
+			rb.AddForce(new Vector2(0, jumpStrengh.Value));
+			jumped.Value += 1;
 		}
 	}
-
-	private void OnCollisionEnter2D(Collision2D collision)
-	{
-		ResetJumped();
-	}
-	private void OnCollisionStay2D(Collision2D collision)
-	{
-		ResetJumped();
-	}
-
-	private void ResetJumped()
-	{
-		jumped.Value = 0;
-	}
-
-	/*[ServerRpc]
-    void setMoveInput_ServerRpc(Vector2 value, ulong sourceNetworkObjectId)
-    {
-        setMoveInput_ClientRpc(value, sourceNetworkObjectId);
-    }
-
-    [ClientRpc]
-    void setMoveInput_ClientRpc(Vector2 value, ulong sourceNetworkObjectId)
-    {
-        moveinput.x = value.x;
-        moveinput.y = value.y;
-
-        //oppositeForce.x = opForce.x;
-        //oppositeForce.y = opForce.y;
-    }*/
 }
