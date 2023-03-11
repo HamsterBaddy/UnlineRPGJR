@@ -1,74 +1,60 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
+using System;
 using System.Net;
-using UnityEngine;
+using System.Reflection;
 using TMPro;
 using Unity.Netcode;
-using Unity.Networking;
-using Unity.Networking.Transport;
 using Unity.Netcode.Transports.UTP;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class GuiManager : MonoBehaviour
 {
-    public TMP_InputField ipAdress;
-    public TMP_InputField portt;
 
-    public Button[] StartButtons;
+	[field: SerializeField]
+	public TMP_InputField IpAdress { get; set; }
+	[field: SerializeField]
+	public TMP_InputField Port { get; set; }
 
-    public Button SetButton;
+	[field: SerializeField]
+	public Button[] StartButtons { get; set; }
 
-    public static GuiManager Singelton;
+	[field: SerializeField]
+	public Button SetButton { get; set; }
 
-    public bool successfulIP = false;
-    public bool successfulPort = false;
+	private static GuiManager _singelton;
+	public static GuiManager Singelton { get => _singelton; set { if (_singelton != null) _singelton = value; } }
 
-    GuiManager()
-    {
-        Singelton = this;
-    }
+	GuiManager()
+	{
+		if (Singelton != null)
+			throw new InvalidOperationException("Es kann nur eine GuiManagerKlasse existieren");
+	}
 
-    public void enableIpInput(bool yes)
-    {
-        foreach (Button b in StartButtons)
-        {
-            b.interactable = !(yes);
-        }
+	public void EnableIpInput(bool yes)
+	{
+		foreach (Button b in StartButtons)
+		{
+			b.interactable = !(yes);
+		}
 
-        SetButton.interactable =
-        ipAdress.interactable =
-        portt.interactable = yes;
-    }
+		SetButton.interactable =
+		IpAdress.interactable =
+		Port.interactable = yes;
+	}
 
-    public void setIP()
-    {
-        //Assembly ImDumb = Assembly.GetAssembly(typeof(Unity.Networking.Transport.NetworkConnection));
-        //ImDumb.GetTypes();
+	public void SetIP()
+	{
+		Debug.Log($"Eingegebene Ip-Adresse{IpAdress.text}");
+		Debug.Log($"Eingegebene Ip-Adresse{Port.text}");
 
-        successfulIP = IPAddress.TryParse(ipAdress.text, out _);
+		if (IPAddress.TryParse(IpAdress.text, out _) && ushort.TryParse(Port.text, out ushort Parsed_Port))
+		{
+			NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(
+				IpAdress.text,  // The IP address is a string
+				Parsed_Port // The port number is an unsigned short
+			);
 
-        Debug.Log(ipAdress.text);
-
-        successfulPort = ushort.TryParse(portt.text, out ushort porttt);
-
-        if (successfulPort && successfulIP)
-        {
-            SetButton.interactable = 
-            ipAdress.interactable = 
-            portt.interactable = false;
-
-            Debug.Log(porttt);
-
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(
-                ipAdress.text,  // The IP address is a string
-                porttt // The port number is an unsigned short
-            );
-
-            foreach (Button b in StartButtons)
-            {
-                b.interactable = true;
-            }
-        }
-    }
+			EnableIpInput(false);
+		}
+	}
 }

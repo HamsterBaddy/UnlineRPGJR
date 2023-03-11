@@ -1,38 +1,40 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
 public class NetworkManagerMine : NetworkManager
 {
-    public void startHost()
-    {
-        this.StartHost();
-        NetworkManager.Singleton.SceneManager.LoadScene("TestWorld", UnityEngine.SceneManagement.LoadSceneMode.Single);
-    }
+	public void startHost()
+	{
+		base.StartHost();
+		LoadTestWorld();
+	}
 
-    public void startClient()
-    {
-        this.StartClient();
-        NetworkManager.Singleton.SceneManager.LoadScene("TestWorld", UnityEngine.SceneManagement.LoadSceneMode.Single);
-    }
+	public void startClient()
+	{
+		base.StartClient();
+		LoadTestWorld();
+	}
 
-    public void startServer()
-    {
-        this.StartServer();
-        NetworkManager.Singleton.SceneManager.LoadScene("TestWorld", UnityEngine.SceneManagement.LoadSceneMode.Single);
-    }
+	public void startServer()
+	{
+		base.StartServer();
+		LoadTestWorld();
+	}
 
-    public void doShutDown()
-    {
-        GuiManager.Singelton.enableIpInput(true);
-        this.Shutdown();
-    }
+	private void LoadTestWorld()
+	{
+		NetworkManager.Singleton.SceneManager.LoadScene("TestWorld", UnityEngine.SceneManagement.LoadSceneMode.Single);
+	}
 
-    public void closeProgram()
-    {
-        doShutDown();
-        Application.Quit();
-    }
+	public void doShutDown()
+	{
+		GuiManager.Singelton.EnableIpInput(true);
+		this.Shutdown();
+	}
+
+	public void closeProgram()
+	{
+		doShutDown();
+		Application.Quit();
+	}
 }

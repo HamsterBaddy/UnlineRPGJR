@@ -275,16 +275,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b21a73c614f7c9d409932b5884e41d46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ipAdress: {fileID: 1569851595}
-  portt: {fileID: 947822820}
-  StartButtons:
+  <IpAdress>k__BackingField: {fileID: 1569851595}
+  <Port>k__BackingField: {fileID: 947822820}
+  <StartButtons>k__BackingField:
   - {fileID: 196394599}
   - {fileID: 1624485733}
   - {fileID: 1512988013}
   - {fileID: 892455486}
-  SetButton: {fileID: 985055926}
-  successfulIP: 0
-  successfulPort: 0
+  <SetButton>k__BackingField: {fileID: 985055926}
 --- !u!1 &196394597
 GameObject:
   m_ObjectHideFlags: 0
@@ -1856,7 +1854,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 45052812}
         m_TargetAssemblyTypeName: GuiManager, Assembly-CSharp
-        m_MethodName: setIP
+        m_MethodName: SetIP
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
