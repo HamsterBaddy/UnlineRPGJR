@@ -1,9 +1,11 @@
 using System;
 using System.Net;
-using System.Reflection;
+
 using TMPro;
+
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,16 +32,16 @@ public class GuiManager : MonoBehaviour
 			throw new InvalidOperationException("Es kann nur eine GuiManagerKlasse existieren");
 	}
 
-    private void Start()
-    {
-		GuiManager.Singelton = this;
-    }
+	private void Start()
+	{
+		Singelton = this;
+	}
 
-    public void EnableIpInput(bool yes)
+	public void EnableIpInput(bool yes)
 	{
 		foreach (Button b in StartButtons)
 		{
-			b.interactable = !(yes);
+			b.interactable = !yes;
 		}
 
 		SetButton.interactable =

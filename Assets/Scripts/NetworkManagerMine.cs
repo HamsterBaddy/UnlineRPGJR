@@ -1,35 +1,36 @@
 using Unity.Netcode;
+
 using UnityEngine;
 
 public class NetworkManagerMine : NetworkManager
 {
 	public void startHost()
 	{
-		base.StartHost();
+		StartHost();
 		LoadTestWorld();
 	}
 
 	public void startClient()
 	{
-		base.StartClient();
+		StartClient();
 		LoadTestWorld();
 	}
 
 	public void startServer()
 	{
-		base.StartServer();
+		StartServer();
 		LoadTestWorld();
 	}
 
 	private void LoadTestWorld()
 	{
-		NetworkManager.Singleton.SceneManager.LoadScene("TopDownWorld", UnityEngine.SceneManagement.LoadSceneMode.Single);
+		Singleton.SceneManager.LoadScene("TopDownWorld", UnityEngine.SceneManagement.LoadSceneMode.Single);
 	}
 
 	public void doShutDown()
 	{
 		GuiManager.Singelton.EnableIpInput(true);
-		this.Shutdown();
+		Shutdown();
 	}
 
 	public void closeProgram()
