@@ -22,7 +22,7 @@ public class GuiManager : MonoBehaviour
 	public Button SetButton { get; set; }
 
 	private static GuiManager _singelton;
-	public static GuiManager Singelton { get => _singelton; set { if (_singelton != null) _singelton = value; } }
+	public static GuiManager Singelton { get => _singelton; set { if (_singelton == null) _singelton = value; } }
 
 	GuiManager()
 	{
@@ -30,7 +30,12 @@ public class GuiManager : MonoBehaviour
 			throw new InvalidOperationException("Es kann nur eine GuiManagerKlasse existieren");
 	}
 
-	public void EnableIpInput(bool yes)
+    private void Start()
+    {
+		GuiManager.Singelton = this;
+    }
+
+    public void EnableIpInput(bool yes)
 	{
 		foreach (Button b in StartButtons)
 		{

@@ -9,12 +9,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1246801788826727571}
-  - component: {fileID: 3691452523535617042}
-  - component: {fileID: 7201833471200789137}
-  - component: {fileID: 7159724594760090831}
-  - component: {fileID: 6572078396078700615}
-  - component: {fileID: 5803039747195333692}
-  - component: {fileID: 1911457350764349847}
+  - component: {fileID: 7209931402859435797}
+  - component: {fileID: 6588321037850851207}
+  - component: {fileID: 1781946668455862544}
+  - component: {fileID: 7247173461664238795}
+  - component: {fileID: 7522266606965834433}
+  - component: {fileID: 8142319658429930135}
+  - component: {fileID: 3782062410147273636}
   m_Layer: 0
   m_Name: PlayerFab
   m_TagString: Player
@@ -38,7 +39,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3691452523535617042
+--- !u!114 &7209931402859435797
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -54,7 +55,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &7201833471200789137
+--- !u!114 &6588321037850851207
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -66,11 +67,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9251914c5bc0b64996252899b507343, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveinput: {x: 0, y: 0}
-  speed: 36
-  notSlide: 0
-  maxSpeed: {x: 6, y: 6}
---- !u!114 &7159724594760090831
+  side:
+    m_InternalValue: 0
+  gravity:
+    m_InternalValue: 3
+  moveinput:
+    m_InternalValue: {x: 0, y: 0}
+  jump:
+    m_InternalValue: 0
+  jumpStrengh:
+    m_InternalValue: 480
+  jumped:
+    m_InternalValue: 0
+  maxJumped:
+    m_InternalValue: 3
+  speed:
+    m_InternalValue: 36
+  notSlide:
+    m_InternalValue: 0
+  maxSpeed:
+    m_InternalValue: {x: 6, y: 6}
+--- !u!114 &1781946668455862544
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -96,7 +113,7 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
---- !u!114 &6572078396078700615
+--- !u!114 &7247173461664238795
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -108,7 +125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80d7c879794dfda4687da0e400131852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!50 &5803039747195333692
+--- !u!50 &7522266606965834433
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
@@ -129,7 +146,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!61 &1911457350764349847
+--- !u!61 &8142319658429930135
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -155,6 +172,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 33.58323, y: 36.126816}
   m_EdgeRadius: 0
+--- !u!114 &3782062410147273636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4013048534662529579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f252442ec21df040bf53eaf93e225ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  noPlayerScenes:
+  - Lobby
+  - Battle
+  childsprite: {fileID: 6104882478789171893}
 --- !u!1 &6104882478789171893
 GameObject:
   m_ObjectHideFlags: 0

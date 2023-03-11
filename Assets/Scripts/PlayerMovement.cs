@@ -1,68 +1,119 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Unity.Netcode;
 using System;
+using System.Collections.Generic;
+using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : NetworkBehaviour
 {
-	public Vector2 moveinput = new(0, 0);
-	//public Vector2 oppositeForce = new Vector2(0,0);
+    public NetworkVariable<bool> side = new NetworkVariable<bool>(false);
+    public NetworkVariable<float> gravity = new NetworkVariable<float>(6f);
 
-	public float speed = 3f;
-	public bool notSlide = false;
-	public Vector2 maxSpeed = new(3, 3);
-	//public float drag = 5f;
+    public NetworkVariable<Vector2> moveinput = new NetworkVariable<Vector2>(new Vector2(0, 0));
+    public NetworkVariable<float> jump = new NetworkVariable<float>(0f);
+    public NetworkVariable<float> jumpStrengh = new NetworkVariable<float>(480f);
+    public NetworkVariable<int> jumped = new NetworkVariable<int>(0);
+    public NetworkVariable<int> maxJumped = new NetworkVariable<int>(3);
+    //public Vector2 oppositeForce = new Vector2(0,0);
 
-	private Rigidbody2D rb;
+    public NetworkVariable<float> speed = new NetworkVariable<float>(3f);
+    public NetworkVariable<bool> notSlide = new NetworkVariable<bool>(false);
+    public NetworkVariable<Vector2> maxSpeed = new NetworkVariable<Vector2>(new Vector2(3, 3));
+    //public float drag = 5f;
 
-	// Start is called before the first frame update
-	void Start()
-	{
-		rb = gameObject.GetComponent<Rigidbody2D>();
-	}
-
-	// Update is called once per frame
-	void Update()
-	{
-		if (IsOwner)
-		{
-			moveinput.y = Input.GetAxisRaw("Vertical");
-			moveinput.x = Input.GetAxisRaw("Horizontal");
-
-			//oppositeForce = -rb.velocity.normalized * drag;
-
-			setMoveInput_ServerRpc(moveinput, NetworkObjectId);
-		}
-	}
-
-	private void FixedUpdate()
-	{
-		if (notSlide)
-		{
-			rb.velocity = new Vector2(0, 0);
-		}
-
-		rb.AddForce(moveinput * speed);
+    private Rigidbody2D rb;
 
 
-		rb.velocity = new Vector2(Math.Sign(rb.velocity.x) * Math.Min(maxSpeed.x, Math.Abs(rb.velocity.x)),
-								  Math.Sign(rb.velocity.y) * Math.Min(maxSpeed.y, Math.Abs(rb.velocity.y)));
-	}
+    // Start is called before the first frame update
+    void Start()
+    {
+        rb = gameObject.GetComponent<Rigidbody2D>();
 
-	[ServerRpc]
-	void setMoveInput_ServerRpc(Vector2 value, ulong sourceNetworkObjectId)
-	{
-		setMoveInput_ClientRpc(value, sourceNetworkObjectId);
-	}
+        side.OnValueChanged += onSideChange;
+    }
 
-	[ClientRpc]
-	void setMoveInput_ClientRpc(Vector2 value, ulong sourceNetworkObjectId)
-	{
-		moveinput.x = value.x;
-		moveinput.y = value.y;
+    // Update is called once per frame
+    void Update()
+    {
+        if (IsOwner)
+        {
+            moveinput.Value = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-		//oppositeForce.x = opForce.x;
-		//oppositeForce.y = opForce.y;
-	}
+            jump.Value = Input.GetAxisRaw("Jump");
+
+            if(jumped.Value == 0 && jump.Value > 0)
+            {
+                jumped.Value = 1;
+            }
+            else if(rb.velocity.y < 0)
+            {
+                jumped.Value = 61;
+            }
+
+            //oppositeForce = -rb.velocity.normalized * drag;
+
+            //setMoveInput_ServerRpc(moveinput.Value, NetworkObjectId);
+        }
+    }
+
+    private void onSideChange(bool previous, bool current)
+    {
+        gameObject.GetComponent<Rigidbody2D>().gravityScale = Convert.ToInt32(current) * gravity.Value;
+    }
+
+
+    private void FixedUpdate()
+    {
+        Debug.Log("Jump: " + jump.Value + " | Jumped: " + jumped.Value);
+
+        if (notSlide.Value)
+        {
+            rb.velocity = new Vector2(0, 0);
+        }
+
+        if (!side.Value)
+        {
+            rb.AddForce(moveinput.Value * speed.Value);
+
+
+            rb.velocity = new Vector2(Math.Sign(rb.velocity.x) * Math.Min(maxSpeed.Value.x, Math.Abs(rb.velocity.x)),
+                                      Math.Sign(rb.velocity.y) * Math.Min(maxSpeed.Value.y, Math.Abs(rb.velocity.y)));
+        }
+        else
+        {
+            rb.AddForce(new Vector2(moveinput.Value.x * speed.Value,0));
+            rb.velocity = new Vector2(Math.Sign(rb.velocity.x) * Math.Min(maxSpeed.Value.x, Math.Abs(rb.velocity.x)),rb.velocity.y);
+            
+            if(jumped.Value > 0 && jumped.Value <= maxJumped.Value)
+            {
+                rb.AddForce(new Vector2(0, jumpStrengh.Value));
+                jumped.Value += 1;
+            }
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        jumped.Value = 0;
+    }
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        jumped.Value = 0;
+    }
+
+    /*[ServerRpc]
+    void setMoveInput_ServerRpc(Vector2 value, ulong sourceNetworkObjectId)
+    {
+        setMoveInput_ClientRpc(value, sourceNetworkObjectId);
+    }
+
+    [ClientRpc]
+    void setMoveInput_ClientRpc(Vector2 value, ulong sourceNetworkObjectId)
+    {
+        moveinput.x = value.x;
+        moveinput.y = value.y;
+
+        //oppositeForce.x = opForce.x;
+        //oppositeForce.y = opForce.y;
+    }*/
 }
