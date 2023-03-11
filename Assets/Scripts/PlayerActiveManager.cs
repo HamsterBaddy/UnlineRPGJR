@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerActiveManager : NetworkBehaviour
 {
-	public List<string> noPlayerScenes = new() { "Lobby", "Battle" };
+	public List<string> noPlayerScenes = new() { "Lobby" };
 
 	public GameObject childsprite;
 
@@ -27,15 +27,6 @@ public class PlayerActiveManager : NetworkBehaviour
 			if (OwnerClientId == clientId)
 			{
 				setEnableComponents(!noPlayerScenes.Contains(sceneName));
-
-				if (sceneName == "TopDownWorld")
-				{
-					GetComponent<PlayerMovement>().side.Value = false;
-				}
-				else if (sceneName == "SideWorld")
-				{
-					GetComponent<PlayerMovement>().side.Value = true;
-				}
 			}
 		}
 	}

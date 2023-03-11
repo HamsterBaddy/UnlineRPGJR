@@ -24,7 +24,7 @@ public class NetworkManagerMine : NetworkManager
 
 	private void LoadTestWorld()
 	{
-		Singleton.SceneManager.LoadScene("TopDownWorld", UnityEngine.SceneManagement.LoadSceneMode.Single);
+		Singleton.SceneManager.LoadScene("SideWorld", UnityEngine.SceneManagement.LoadSceneMode.Single);
 	}
 
 	public void doShutDown()

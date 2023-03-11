@@ -8,12 +8,6 @@ public class SideGuiManager : MonoBehaviour
 	private static SideGuiManager _singelton;
 	public static SideGuiManager Singelton { get => _singelton; set { if (_singelton == null) _singelton = value; } }
 
-	[field: SerializeField]
-	public Button enterBattleButton { get; set; }
-
-	[field: SerializeField]
-	public Button enterTopDownButton { get; set; }
-
 	SideGuiManager()
 	{
 		if (Singelton != null)
@@ -24,23 +18,5 @@ public class SideGuiManager : MonoBehaviour
 	void Start()
 	{
 		Singelton = this;
-		enterBattleButton.onClick.AddListener(TaskOnClickBattle);
-		enterTopDownButton.onClick.AddListener(TaskOnClickTopDown);
 	}
-
-	public void TaskOnClickBattle()
-	{
-		SceneChangeManager.Singelton.changeScene("Battle");
-	}
-
-	public void TaskOnClickTopDown()
-	{
-		SceneChangeManager.Singelton.changeScene("TopDownWorld");
-	}
-
-	//// Update is called once per frame
-	//void Update()
-	//{
-
-	//}
 }
