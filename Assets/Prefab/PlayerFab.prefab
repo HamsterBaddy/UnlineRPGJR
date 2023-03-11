@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 7522266606965834433}
   - component: {fileID: 8142319658429930135}
   - component: {fileID: 3782062410147273636}
+  - component: {fileID: 7955795349739689499}
   m_Layer: 0
   m_Name: PlayerFab
   m_TagString: Player
@@ -67,20 +68,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9251914c5bc0b64996252899b507343, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isGrounded:
+    m_InternalValue: 0
+  velocity:
+    m_InternalValue: 0
+  groundCheck: {fileID: 7955795349739689499}
   side:
     m_InternalValue: 0
   gravity:
     m_InternalValue: 3
   moveinput:
     m_InternalValue: {x: 0, y: 0}
-  jump:
+  jumpInput:
     m_InternalValue: 0
-  jumpStrengh:
-    m_InternalValue: 480
-  jumped:
-    m_InternalValue: 0
-  maxJumped:
-    m_InternalValue: 3
+  buttonTime:
+    m_InternalValue: 0.5
+  jumpHeight:
+    m_InternalValue: 5
+  cancelRate:
+    m_InternalValue: 100
   speed:
     m_InternalValue: 36
   notSlide:
@@ -188,6 +194,21 @@ MonoBehaviour:
   - Lobby
   - Battle
   childsprite: {fileID: 6104882478789171893}
+--- !u!114 &7955795349739689499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4013048534662529579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab119b619d08da44ba5681bdaf47a1bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 6588321037850851207}
+  offset: 0.1
+  surfacePosition: {x: 0, y: 0}
 --- !u!1 &6104882478789171893
 GameObject:
   m_ObjectHideFlags: 0

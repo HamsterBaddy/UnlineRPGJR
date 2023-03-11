@@ -24,18 +24,8 @@ public class SideGuiManager : MonoBehaviour
 	void Start()
 	{
 		Singelton = this;
-		enterBattleButton.onClick.AddListener(TaskOnClickBattle);
-		enterTopDownButton.onClick.AddListener(TaskOnClickTopDown);
-	}
-
-	public void TaskOnClickBattle()
-	{
-		SceneChangeManager.Singelton.changeScene("Battle");
-	}
-
-	public void TaskOnClickTopDown()
-	{
-		SceneChangeManager.Singelton.changeScene("TopDownWorld");
+		enterBattleButton.onClick.AddListener(() => SceneChangeManager.Singelton.changeScene("Battle"));
+		enterTopDownButton.onClick.AddListener(() => SceneChangeManager.Singelton.changeScene("TopDownWorld"));
 	}
 
 	//// Update is called once per frame
