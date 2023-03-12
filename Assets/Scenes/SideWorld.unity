@@ -906,7 +906,6 @@ GameObject:
   - component: {fileID: 1229721609}
   - component: {fileID: 1229721611}
   - component: {fileID: 1229721610}
-  - component: {fileID: 1229721612}
   m_Layer: 0
   m_Name: Tilemap
   m_TagString: Untagged
@@ -2094,22 +2093,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!19719996 &1229721612
-TilemapCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1229721608}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 6200000, guid: 4f662405eccdebe4daeb124d0feb1f9f, type: 2}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_MaximumTileChangeCount: 1000
-  m_ExtrusionFactor: 0
 --- !u!1 &1237625217
 GameObject:
   m_ObjectHideFlags: 0
@@ -2870,5 +2853,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35d51b0ddac635840ae43456a9b55e62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <enterBattleButton>k__BackingField: {fileID: 219021084}
-  <enterTopDownButton>k__BackingField: {fileID: 472187649}

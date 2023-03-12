@@ -10,13 +10,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1246801788826727571}
   - component: {fileID: 7209931402859435797}
+  - component: {fileID: 1874931129899652433}
   - component: {fileID: 6588321037850851207}
   - component: {fileID: 1781946668455862544}
   - component: {fileID: 7247173461664238795}
   - component: {fileID: 7522266606965834433}
   - component: {fileID: 8142319658429930135}
   - component: {fileID: 3782062410147273636}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PlayerFab
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -55,6 +56,23 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &1874931129899652433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4013048534662529579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05bda7f2c9358f942ac02bf004c2f0ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpHeight: 4
+  jumpTime: 0.4
+  jumpForce: 0
+  wallJumpForce: 0
+  airControl: 0.8
 --- !u!114 &6588321037850851207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67,22 +85,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9251914c5bc0b64996252899b507343, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  side:
-    m_InternalValue: 0
   gravity:
-    m_InternalValue: 3
+    m_InternalValue: 9
   moveinput:
     m_InternalValue: {x: 0, y: 0}
-  jump:
+  jumpInput:
     m_InternalValue: 0
-  jumpStrengh:
-    m_InternalValue: 480
-  jumped:
-    m_InternalValue: 0
-  maxJumped:
-    m_InternalValue: 3
+  jumpForce: 10
+  maxJumpTime: 1
+  maxJumpHeight: 4
+  isJumping: 0
+  jumpTime: 0
+  initialJumpForce: 0
+  startY: 0
+  offset:
+    m_InternalValue: {x: 0, y: 0.1}
+  distanceRay:
+    m_InternalValue: 0.1
   speed:
-    m_InternalValue: 36
+    m_InternalValue: 81
   notSlide:
     m_InternalValue: 0
   maxSpeed:
@@ -142,9 +163,9 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 9
   m_Material: {fileID: 0}
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!61 &8142319658429930135
 BoxCollider2D:
@@ -198,7 +219,7 @@ GameObject:
   m_Component:
   - component: {fileID: 962302641960155025}
   - component: {fileID: 1688053388644971127}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: ReddishHairRedEyes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
