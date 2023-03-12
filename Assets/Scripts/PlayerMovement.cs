@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour
 {
-	public NetworkVariable<bool>    side            = new(false);
 	public NetworkVariable<float>   gravity         = new(6f);
 
 	public NetworkVariable<Vector2> moveinput       = new(new Vector2(0, 0), writePerm: NetworkVariableWritePermission.Owner);
@@ -27,39 +26,33 @@ public class PlayerMovement : NetworkBehaviour
 	void Start()
 	{
 		rb = gameObject.GetComponent<Rigidbody2D>();
-
-		side.OnValueChanged += onSideChange;
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-		if (IsOwner)
+		if (!IsOwner) return;
+
+		moveinput.Value = new Vector2(Input.GetAxisRaw("Horizontal") * 10, Input.GetAxisRaw("Vertical") * 10);
+
+		jump.Value = Input.GetAxisRaw("Jump");
+
+		if (jumped.Value == 0 && jump.Value > 0)
 		{
-			moveinput.Value = new Vector2(Input.GetAxisRaw("Horizontal") * 10, Input.GetAxisRaw("Vertical") * 10);
-
-			jump.Value = Input.GetAxisRaw("Jump");
-
-			if (jumped.Value == 0 && jump.Value > 0)
-			{
-				jumped.Value = 1;
-			}
-			else if (rb.velocity.y < 0)
-			{
-				jumped.Value = 61;
-			}
+			jumped.Value = 1;
 		}
-	}
-
-	private void onSideChange(bool previous, bool current)
-	{
-		gameObject.GetComponent<Rigidbody2D>().gravityScale = Convert.ToInt32(current) * gravity.Value;
+		else if (rb.velocity.y < 0)
+		{
+			jumped.Value = 61;
+		}
 	}
 
 
 	private void FixedUpdate()
 	{
-		Debug.Log($"Jump: {jump.Value} | Jumped: {jumped.Value}");
+		//if (!IsOwner) return;
+
+		Debug.Log($"Owner: {OwnerClientId} | Jump: {jump.Value} | Jumped: {jumped.Value}");
 
 		if (notSlide.Value)
 		{
