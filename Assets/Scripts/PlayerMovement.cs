@@ -9,10 +9,10 @@ public class PlayerMovement : NetworkBehaviour
 	public NetworkVariable<bool>    side            = new(false);
 	public NetworkVariable<float>   gravity         = new(6f);
 
-	public NetworkVariable<Vector2> moveinput       = new(new Vector2(0, 0));
-	public NetworkVariable<float>   jump            = new(0f);
+	public NetworkVariable<Vector2> moveinput       = new(new Vector2(0, 0), writePerm: NetworkVariableWritePermission.Owner);
+	public NetworkVariable<float>   jump            = new(0f, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<float>   jumpStrengh     = new(480f);
-	public NetworkVariable<int>     jumped          = new(0);
+	public NetworkVariable<int>     jumped          = new(0, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<int>     maxJumped       = new(3);
 
 	public NetworkVariable<float>   speed           = new(3f);
@@ -36,7 +36,7 @@ public class PlayerMovement : NetworkBehaviour
 	{
 		if (IsOwner)
 		{
-			moveinput.Value = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+			moveinput.Value = new Vector2(Input.GetAxisRaw("Horizontal") * 10, Input.GetAxisRaw("Vertical") * 10);
 
 			jump.Value = Input.GetAxisRaw("Jump");
 
