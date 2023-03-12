@@ -29,7 +29,6 @@ public class NetworkManagerMine : NetworkManager
 
 	public void doShutDown()
 	{
-		GuiManager.Singelton.EnableIpInput(true);
 		Shutdown();
 	}
 
