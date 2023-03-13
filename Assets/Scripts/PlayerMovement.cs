@@ -4,7 +4,7 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-//https://gamedevbeginner.com/how-to-jump-in-unity-with-or-without-physics/#jump_unity — jump based on this
+//https://gamedevbeginner.com/how-to-jump-in-unity-with-or-without-physics/#jump_unity ï¿½ jump based on this
 public class PlayerMovement : NetworkBehaviour
 {
 	//public NetworkVariable<bool>    side              = new(false);
