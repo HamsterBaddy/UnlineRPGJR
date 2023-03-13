@@ -4773,6 +4773,10 @@ MonoBehaviour:
   areaAudios: []
   battle: 0
   doPlay: 1
+  muteAudio: 0
+  muteSFX: 0
+  standardAudioVolume: 1
+  standardSFXVolume: 0.3
   standardSoundTrack: Vulcano
 --- !u!114 &8043588073865034063
 MonoBehaviour:

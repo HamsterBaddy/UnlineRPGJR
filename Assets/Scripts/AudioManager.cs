@@ -28,7 +28,7 @@ public class AudioManager : NetworkBehaviour
     private bool last_muteSFX = false;
 
     public float standardAudioVolume = 1f;
-    public float standardSFXVolume = 0.6f;
+    public float standardSFXVolume = 0.3f;
 
     public string standardSoundTrack = "Vulcano";
 
