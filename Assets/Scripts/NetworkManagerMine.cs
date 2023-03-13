@@ -13,7 +13,7 @@ public class NetworkManagerMine : NetworkManager
 	public void startClient()
 	{
 		StartClient();
-		LoadTestWorld();
+		//LoadTestWorld();
 	}
 
 	public void startServer()
@@ -25,6 +25,7 @@ public class NetworkManagerMine : NetworkManager
 	private void LoadTestWorld()
 	{
 		Singleton.SceneManager.LoadScene("SideWorld", UnityEngine.SceneManagement.LoadSceneMode.Single);
+		AudioManager.Instance.doPlay = true;
 	}
 
 	public void doShutDown()
@@ -37,5 +38,10 @@ public class NetworkManagerMine : NetworkManager
 	{
 		doShutDown();
 		Application.Quit();
+	}
+
+	public GameObject getPlayer()
+    {
+		return NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
 	}
 }

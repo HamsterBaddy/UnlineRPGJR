@@ -37,6 +37,8 @@ public class PlayerMovement : NetworkBehaviour
 	public NetworkVariable<float> jumpStrength = new(24f);
 	public NetworkVariable<bool> jumping = new(false);
 
+	public NetworkVariable<Vector2> lastGroundPosition;
+
 
 	//public NetworkVariable<Vector2> surfacePosition   = new();
 	//ContactFilter2D filter;
@@ -49,6 +51,7 @@ public class PlayerMovement : NetworkBehaviour
 	public NetworkVariable<float>   speed             = new(3f);
 	public NetworkVariable<bool>    notSlide          = new(false);
 	public NetworkVariable<Vector2> maxSpeed          = new(new Vector2(3, 3));
+
 	//public float drag = 5f;
 
 	private Rigidbody2D rb;
@@ -59,10 +62,13 @@ public class PlayerMovement : NetworkBehaviour
 	{
 		rb = gameObject.GetComponent<Rigidbody2D>();
 		rb.gravityScale = gravity.Value;
+
+		lastGroundPosition = new(new Vector2(gameObject.transform.position.x, gameObject.transform.position.y));
+
 		//initialJumpForce = jumpForce;
 
-		//side.OnValueChanged += onSideChange;
-	}
+	//side.OnValueChanged += onSideChange;
+}
 
 	public bool isGrounded()
     {
@@ -79,18 +85,29 @@ public class PlayerMovement : NetworkBehaviour
 					//int resultNumber = rb.OverlapCollider(new ContactFilter2D().NoFilter(),results);
 					//Debug.Log(resultNumber);
 					//if(resultNumber == 0)
-     //               {
+					//               {
 					return false;
      //               }
 				}
 			}
 		}
 
+		//if(!grounded.Value)
+  //      {
+		//	AudioManager.Instance.PlaySFX("Jump Landed");
+  //      }
+
+
 		return true;
 	}
 
-	// Update is called once per frame
-	void Update()
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+		AudioManager.Instance.PlaySFX("Jump Landed");
+	}
+
+    // Update is called once per frame
+    void Update()
 	{
 		rb.gravityScale = gravity.Value;
 
@@ -232,8 +249,10 @@ public class PlayerMovement : NetworkBehaviour
 
 		if(!jumping.Value && grounded.Value && jumpInput.Value != 0)
         {
+			jumping.Value = true;
 			rb.velocity = new(rb.velocity.x,0);
 			rb.AddForce((Vector2.up * (jumpInput.Value * (jumpStrength.Value /* * (-1 * Physics2D.gravity.y * rb.gravityScale)*/))) /* * Time.deltaTime*/, ForceMode2D.Impulse);
+			AudioManager.Instance.PlaySFX("Jump");
 		}
 
 		//if (isJumping && jumpTime >= maxJumpTime)

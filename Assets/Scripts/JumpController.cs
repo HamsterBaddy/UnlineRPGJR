@@ -3,7 +3,7 @@ using UnityEngine;
 public class JumpController : MonoBehaviour
 {
     [SerializeField] private float jumpHeight = 4f;
-    [SerializeField] private float jumpTime = 0.4f;
+    //[SerializeField] private float jumpTime = 0.4f;
     [SerializeField] private float jumpForce;
     [SerializeField] private float wallJumpForce;
     [SerializeField] private float airControl = 0.8f;
