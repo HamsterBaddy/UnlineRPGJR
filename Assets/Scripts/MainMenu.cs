@@ -23,7 +23,9 @@ public class MainMenu : MonoBehaviour
 
 	[SerializeField] private Button         _StartGameButton;
 	[SerializeField] private Button         _AcceptJoinButton;
-	[SerializeField] private TMP_Text       _JoinRequstText;
+	[SerializeField] private TMP_Text       _JoinRequestText;
+
+	[SerializeField] private TMP_Text       _JoinAnswerText;
 
 	private NetworkManager.ConnectionApprovalResponse JoinResponse = null;
 
@@ -37,12 +39,18 @@ public class MainMenu : MonoBehaviour
 		_StartGameButton.onClick.AddListener(StartGame);
 		_ExitAppButton.onClick.AddListener(ExitGame);
 		_AcceptJoinButton.onClick.AddListener(AcceptJoinGame);
-		_StartGameButton.enabled = false;
-
-
-		NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
-		NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
 	}
+
+	private void Start()
+	{
+		NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
+		NetworkManager.Singleton.NetworkConfig.ClientConnectionBufferTimeout = 60;
+
+		NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
+		NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
+		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
+	}
+
 
 	/// <summary>
 	/// Listener für Host-Button
@@ -54,6 +62,7 @@ public class MainMenu : MonoBehaviour
 
 	private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
 	{
+		NetworkLog.LogInfoServer("Received ConnectionRequest");
 		// The client identifier to be authenticated
 		ulong clientId = request.ClientNetworkId;
 
@@ -66,8 +75,24 @@ public class MainMenu : MonoBehaviour
 		string RequestString = $"Client-Id:{clientId}; {System.Text.Encoding.ASCII.GetString(connectionData)}";
 		Debug.Log("Requst-String: " + RequestString);
 
-		_JoinRequstText.text = RequestString;
+		_JoinAnswerText.text = RequestString;
 		JoinResponse = response;
+		_AcceptJoinButton.interactable = true;
+	}
+
+	private void OnClientDisconnectCallback(ulong obj)
+	{
+		NetworkLog.LogInfoServer("Disconnected On Client");
+		if (!NetworkManager.Singleton.IsServer && NetworkManager.Singleton.DisconnectReason != string.Empty)
+		{
+			Debug.Log($"Approval Declined Reason: {NetworkManager.Singleton.DisconnectReason}");
+		}
+	}
+
+	private void OnClientConnectedCallback(ulong obj)
+	{
+		_JoinAnswerText.text += "Server Approved Connection";
+		NetworkLog.LogInfoServer($"Connected On Client {NetworkManager.Singleton.LocalClientId}");
 	}
 
 	/// <summary>
@@ -75,8 +100,11 @@ public class MainMenu : MonoBehaviour
 	/// </summary>
 	public void AcceptJoinGame()
 	{
+		NetworkLog.LogInfoServer("Accepting Join Request");
 		JoinResponse.Approved = true;
 		JoinResponse.CreatePlayerObject = true;
+		_StartGameButton.interactable = true;
+		JoinResponse.Pending = false;
 	}
 
 	/// <summary>
@@ -84,6 +112,7 @@ public class MainMenu : MonoBehaviour
 	/// </summary>
 	public void StartGame()
 	{
+		NetworkLog.LogInfoServer("Starting Game");
 		NetworkManager.Singleton.SceneManager.LoadScene("SideWorld", LoadSceneMode.Single);
 	}
 
@@ -107,6 +136,10 @@ public class MainMenu : MonoBehaviour
 
 		NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(connectionData);
 		NetworkManager.Singleton.StartClient();
+		NetworkLog.LogInfoServer($"Trying To Connect To Server; Connectiondata: {connectionData}");
+
+		_JoinAnswerText.gameObject.SetActive(true);
+		_JoinAnswerText.text = connectionData + Environment.NewLine;
 	}
 
 	/// <summary>
