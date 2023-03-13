@@ -37,7 +37,9 @@ public class PlayerMovement : NetworkBehaviour
 	public NetworkVariable<float> jumpStrength = new(24f);
 	public NetworkVariable<bool> jumping = new(false, writePerm: NetworkVariableWritePermission.Owner);
 
-	public NetworkVariable<Vector2> lastGroundPosition;
+	public NetworkVariable<Vector2> lastGroundPosition = new(Vector2.zero);
+	public NetworkVariable<float> airtime = new(-1f);
+	public NetworkVariable<float> maxFallTime = new(9f);
 
 
 	//public NetworkVariable<Vector2> surfacePosition   = new();
@@ -63,7 +65,7 @@ public class PlayerMovement : NetworkBehaviour
 		rb = gameObject.GetComponent<Rigidbody2D>();
 		rb.gravityScale = gravity.Value;
 
-		lastGroundPosition = new(new Vector2(gameObject.transform.position.x, gameObject.transform.position.y));
+		lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
 
 		//initialJumpForce = jumpForce;
 
@@ -103,11 +105,27 @@ public class PlayerMovement : NetworkBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-		AudioManager.Instance.PlaySFX("Jump Landed");
+		Debug.Log("Enter Coll 2D of " + collision.gameObject.tag + " is Grounded: " + grounded.Value + " | " + isGrounded());
+		if (grounded.Value && collision.gameObject.tag == "Ground")
+		{
+			lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
+			airtime.Value = -1;
+			AudioManager.Instance.PlaySFX("Jump Landed");
+		}
 	}
 
-    // Update is called once per frame
-    void Update()
+	private void OnCollisionExit2D(Collision2D collision)
+	{
+		Debug.Log("Exit Coll 2D of " + collision.gameObject.tag + " is Grounded: " + grounded.Value + " | " + isGrounded());
+		if(grounded.Value && collision.gameObject.tag == "Ground")
+		{
+			airtime.Value = Time.realtimeSinceStartup;
+			lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
+		}
+	}
+
+	// Update is called once per frame
+	void Update()
 	{
 		rb.gravityScale = gravity.Value;
 
@@ -117,6 +135,15 @@ public class PlayerMovement : NetworkBehaviour
         {
 			jumping.Value = false;
         }
+
+		if(airtime.Value != -1)
+		{
+			if(Time.realtimeSinceStartup - airtime.Value > maxFallTime.Value)
+			{
+				airtime.Value = -1;
+				transform.position = lastGroundPosition.Value;
+			}
+		}
 
 		//if(jumping.Value && rb.velocity.y <= 0)
 		//      {
