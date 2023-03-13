@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 
 using TMPro;
@@ -20,6 +21,12 @@ public class MainMenu : MonoBehaviour
 	[SerializeField] private Button         _HostGameButton;
 	[SerializeField] private Button         _ExitAppButton;
 
+	[SerializeField] private Button         _StartGameButton;
+	[SerializeField] private Button         _AcceptJoinButton;
+	[SerializeField] private TMP_Text       _JoinRequstText;
+
+	private NetworkManager.ConnectionApprovalResponse JoinResponse = null;
+
 	/// <summary>
 	/// Initialises Click-Listeners
 	/// </summary>
@@ -27,7 +34,14 @@ public class MainMenu : MonoBehaviour
 	{
 		_HostGameButton.onClick.AddListener(HostGame);
 		_JoinGameButton.onClick.AddListener(JoinGame);
+		_StartGameButton.onClick.AddListener(StartGame);
 		_ExitAppButton.onClick.AddListener(ExitGame);
+		_AcceptJoinButton.onClick.AddListener(AcceptJoinGame);
+		_StartGameButton.enabled = false;
+
+
+		NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
+		NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
 	}
 
 	/// <summary>
@@ -36,6 +50,40 @@ public class MainMenu : MonoBehaviour
 	public void HostGame()
 	{
 		NetworkManager.Singleton.StartHost();
+	}
+
+	private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+	{
+		// The client identifier to be authenticated
+		ulong clientId = request.ClientNetworkId;
+
+		// Additional connection data defined by user code
+		byte[] connectionData = request.Payload;
+
+		// Your approval logic determines the following values
+		response.Pending = true;
+
+		string RequestString = $"Client-Id:{clientId}; {System.Text.Encoding.ASCII.GetString(connectionData)}";
+		Debug.Log("Requst-String: " + RequestString);
+
+		_JoinRequstText.text = RequestString;
+		JoinResponse = response;
+	}
+
+	/// <summary>
+	/// Listener für Accept-Join-Button
+	/// </summary>
+	public void AcceptJoinGame()
+	{
+		JoinResponse.Approved = true;
+		JoinResponse.CreatePlayerObject = true;
+	}
+
+	/// <summary>
+	/// Listener für Scene-Loader nachdem Spierl gejoint ist
+	/// </summary>
+	public void StartGame()
+	{
 		NetworkManager.Singleton.SceneManager.LoadScene("SideWorld", LoadSceneMode.Single);
 	}
 
@@ -51,6 +99,13 @@ public class MainMenu : MonoBehaviour
 		{
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(_IPAdressField.text, Parsed_Port);
 		}
+
+		IPAddress[] localIPs = Dns.GetHostAddresses(Dns.GetHostName());
+
+		string connectionData = $"Target-Ip{_IPAdressField.text}; Target-Port: {_PortField.text}, Origin-IPs: {localIPs}, Origin-Computer: {Environment.MachineName}";
+		Debug.Log("Connection-Data: " + connectionData);
+
+		NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(connectionData);
 		NetworkManager.Singleton.StartClient();
 	}
 

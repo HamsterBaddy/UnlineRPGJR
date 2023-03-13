@@ -863,11 +863,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: 9326ea23-1cad-4d9f-99cf-a6bb6558ed6d
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: UnlineRPGJR
+  organizationId: semarc
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 
