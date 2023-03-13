@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1246801788826727571}
   - component: {fileID: 7209931402859435797}
-  - component: {fileID: 1874931129899652433}
   - component: {fileID: 6588321037850851207}
   - component: {fileID: 1781946668455862544}
   - component: {fileID: 7247173461664238795}
@@ -56,23 +55,6 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &1874931129899652433
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4013048534662529579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05bda7f2c9358f942ac02bf004c2f0ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  jumpHeight: 4
-  jumpTime: 0.4
-  jumpForce: 0
-  wallJumpForce: 0
-  airControl: 0.8
 --- !u!114 &6588321037850851207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91,17 +73,16 @@ MonoBehaviour:
     m_InternalValue: {x: 0, y: 0}
   jumpInput:
     m_InternalValue: 0
-  jumpForce: 10
-  maxJumpTime: 1
-  maxJumpHeight: 4
-  isJumping: 0
-  jumpTime: 0
-  initialJumpForce: 0
-  startY: 0
+  grounded:
+    m_InternalValue: 0
   offset:
     m_InternalValue: {x: 0, y: 0.1}
   distanceRay:
     m_InternalValue: 0.1
+  jumpStrength:
+    m_InternalValue: 24
+  jumping:
+    m_InternalValue: 0
   speed:
     m_InternalValue: 81
   notSlide:
@@ -159,7 +140,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 6
+  m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 9
   m_Material: {fileID: 0}
@@ -180,7 +161,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.69758606, y: 5.936592}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -191,7 +172,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 33.58323, y: 36.126816}
+  m_Size: {x: 30, y: 30}
   m_EdgeRadius: 0
 --- !u!114 &3782062410147273636
 MonoBehaviour:

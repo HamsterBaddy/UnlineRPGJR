@@ -12,6 +12,7 @@ public class PlayerMovement : NetworkBehaviour
 
 	public NetworkVariable<Vector2> moveinput         = new(new Vector2(0, 0));
 	public NetworkVariable<float>   jumpInput         = new(0f);
+	public NetworkVariable<bool> grounded = new(false);
 
 	//public NetworkVariable<float>   buttonTime        = new(0.5f);
 	//public NetworkVariable<float>   jumpHeight        = new(5);
@@ -21,18 +22,22 @@ public class PlayerMovement : NetworkBehaviour
 	//NetworkVariable<bool>           jumpCancelled     = new();
 	//public NetworkVariable<bool>    falling           = new(true);
 
-	public float jumpForce = 10f; // the force with which the character will jump
-	public float maxJumpTime = 1f; // the maximum amount of time the character can jump
-	public float maxJumpHeight = 4f; // the maximum height the character can jump
-	public bool isJumping = false; // a flag to check if the character is jumping
-	public float jumpTime = 0f; // the current amount of time the character has been jumping
-	public float initialJumpForce; // the initial force with which the character will jump
-	public float startY; // the y position of the character when it starts jumping
+	//public float jumpForce = 10f; // the force with which the character will jump
+	//public float maxJumpTime = 1f; // the maximum amount of time the character can jump
+	//public float maxJumpHeight = 4f; // the maximum height the character can jump
+	//public bool isJumping = false; // a flag to check if the character is jumping
+	//public float jumpTime = 0f; // the current amount of time the character has been jumping
+	//public float initialJumpForce; // the initial force with which the character will jump
+	//public float startY; // the y position of the character when it starts jumping
 
 
 
 	public NetworkVariable<Vector2> offset            = new(new Vector2(0f,0.1f));
 	public NetworkVariable<float>   distanceRay        = new(0.1f);
+	public NetworkVariable<float> jumpStrength = new(24f);
+	public NetworkVariable<bool> jumping = new(false);
+
+
 	//public NetworkVariable<Vector2> surfacePosition   = new();
 	//ContactFilter2D filter;
 	//RaycastHit2D[] results = new RaycastHit2D[3];
@@ -53,7 +58,8 @@ public class PlayerMovement : NetworkBehaviour
 	void Start()
 	{
 		rb = gameObject.GetComponent<Rigidbody2D>();
-		initialJumpForce = jumpForce;
+		rb.gravityScale = gravity.Value;
+		//initialJumpForce = jumpForce;
 
 		//side.OnValueChanged += onSideChange;
 	}
@@ -69,7 +75,13 @@ public class PlayerMovement : NetworkBehaviour
 				RaycastHit2D hitMiddle = Physics2D.Raycast(new Vector2(GetComponent<Collider2D>().bounds.center.x, GetComponent<Collider2D>().bounds.center.y - GetComponent<Collider2D>().bounds.extents.y) - new Vector2(0, offset.Value.y), -Vector2.up, distanceRay.Value);
 				if (hitRight.collider == null)
 				{
+					//Collider2D[] results = new Collider2D[3];
+					//int resultNumber = rb.OverlapCollider(new ContactFilter2D().NoFilter(),results);
+					//Debug.Log(resultNumber);
+					//if(resultNumber == 0)
+     //               {
 					return false;
+     //               }
 				}
 			}
 		}
@@ -80,6 +92,15 @@ public class PlayerMovement : NetworkBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		rb.gravityScale = gravity.Value;
+
+		grounded.Value = isGrounded();
+
+		if(jumping.Value && rb.velocity.y < 0)
+        {
+			jumping.Value = false;
+        }
+
 		//if(jumping.Value && rb.velocity.y <= 0)
 		//      {
 		//	jumping.Value = false;
@@ -178,12 +199,12 @@ public class PlayerMovement : NetworkBehaviour
 
 			jumpInput.Value = Input.GetAxisRaw("Jump");
 
-			if (isGrounded() && jumpInput.Value != 0)
-			{
-				isJumping = true;
-				jumpTime = 0f;
-				startY = transform.position.y;
-			}
+			//if (isGrounded() && jumpInput.Value != 0)
+			//{
+			//	isJumping = true;
+			//	jumpTime = 0f;
+			//	startY = transform.position.y;
+			//}
 
 			//if (!falling.Value && !jumping.Value && jumpInput.Value != 0)
 			//{
@@ -209,14 +230,20 @@ public class PlayerMovement : NetworkBehaviour
 			//}
 		}
 
-		if (isJumping && jumpTime >= maxJumpTime)
-		{
-			isJumping = false;
+		if(!jumping.Value && grounded.Value && jumpInput.Value != 0)
+        {
+			rb.velocity = new(rb.velocity.x,0);
+			rb.AddForce((Vector2.up * (jumpInput.Value * (jumpStrength.Value /* * (-1 * Physics2D.gravity.y * rb.gravityScale)*/))) /* * Time.deltaTime*/, ForceMode2D.Impulse);
 		}
-		else if (isJumping && transform.position.y > maxJumpHeight)
-		{
-			isJumping = false;
-		}
+
+		//if (isJumping && jumpTime >= maxJumpTime)
+		//{
+		//	isJumping = false;
+		//}
+		//else if (isJumping && transform.position.y > maxJumpHeight)
+		//{
+		//	isJumping = false;
+		//}
 
 		//Debug.Log(jumpTime.Value + " | " + buttonTime.Value + " | " + falling.Value + " | " + jumping.Value);
 	}
@@ -231,10 +258,10 @@ public class PlayerMovement : NetworkBehaviour
 
 	private void FixedUpdate()
 	{
-		if (isGrounded())
-		{
-			GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, 0f);
-		}
+		//if (isGrounded())
+		//{
+		//	GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, 0f);
+		//}
 
 
 		//if (jumpCancelled.Value && jumping.Value && rb.velocity.y > 0)
@@ -244,30 +271,30 @@ public class PlayerMovement : NetworkBehaviour
 		//	rb.AddForce(Vector2.down * cancelForce * cancelRate.Value, ForceMode2D.Impulse);
 		//}
 
-		if (isJumping && jumpTime < maxJumpTime)
-		{
-			// calculate the amount of force to apply to the character based on the time the jump button was pressed
-			float jumpForceMultiplier = Mathf.Lerp(0f, 1f, jumpTime / maxJumpTime);
-			jumpForce = initialJumpForce * jumpForceMultiplier;
+		//if (isJumping && jumpTime < maxJumpTime)
+		//{
+		//	// calculate the amount of force to apply to the character based on the time the jump button was pressed
+		//	float jumpForceMultiplier = Mathf.Lerp(0f, 1f, jumpTime / maxJumpTime);
+		//	jumpForce = initialJumpForce * jumpForceMultiplier;
 
-			// apply the force to the character
-			GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-			//GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+		//	// apply the force to the character
+		//	GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+		//	//GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
 
-			jumpTime += Time.fixedDeltaTime;
+		//	jumpTime += Time.fixedDeltaTime;
 
-			// limit the maximum jump height relative to the starting y position
-			if (transform.position.y - startY > maxJumpHeight)
-			{
-				GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, 0f);
-				isJumping = false;
-			}
-		}
-		else
-		{
-			isJumping = false;
-			jumpForce = initialJumpForce;
-		}
+		//	// limit the maximum jump height relative to the starting y position
+		//	if (transform.position.y - startY > maxJumpHeight)
+		//	{
+		//		GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, 0f);
+		//		isJumping = false;
+		//	}
+		//}
+		//else
+		//{
+		//	isJumping = false;
+		//	jumpForce = initialJumpForce;
+		//}
 
 		if (notSlide.Value)
 		{
