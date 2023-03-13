@@ -29,11 +29,11 @@ public class AudioManagerNah : NetworkBehaviour
 		public AudioClip val;
 	}
 
-	public List<KeyValuePair> soundTracks = new List<KeyValuePair>();
-	Dictionary<string, AudioClip> soundtracksDic = new Dictionary<string, AudioClip>();
+	public List<KeyValuePair> soundTracks = new();
+	Dictionary<string, AudioClip> soundtracksDic = new();
 
-	public List<KeyValuePair> SFXs = new List<KeyValuePair>();
-	Dictionary<string, AudioClip> SFXDic = new Dictionary<string, AudioClip>();
+	public List<KeyValuePair> SFXs = new();
+	Dictionary<string, AudioClip> SFXDic = new();
 
 	AudioManagerNah()
 	{
@@ -54,12 +54,12 @@ public class AudioManagerNah : NetworkBehaviour
 			Destroy(gameObject);
 		}
 
-		foreach (var kvp in soundTracks)
+		foreach (KeyValuePair kvp in soundTracks)
 		{
 			soundtracksDic[kvp.key] = kvp.val;
 		}
 
-		foreach (var kvp in SFXs)
+		foreach (KeyValuePair kvp in SFXs)
 		{
 			SFXDic[kvp.key] = kvp.val;
 		}
@@ -67,11 +67,6 @@ public class AudioManagerNah : NetworkBehaviour
 		//Set SoundManager to DontDestroyOnLoad so that it won't be destroyed when reloading our scene.
 		DontDestroyOnLoad(gameObject);
 	}
-
-    private void Start()
-    {
-        
-    }
 
     // Play a single clip through the sound effects source.
     public void Play(AudioClip clip)
