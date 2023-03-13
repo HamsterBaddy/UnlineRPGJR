@@ -4736,6 +4736,20 @@ MonoBehaviour:
     loop: 1
     spatialBlend: 0
     source: {fileID: 0}
+  - name: Linebeck
+    clip: {fileID: 8300000, guid: b2f53696349322746b33d4d576d33b83, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: Grand Sea
+    clip: {fileID: 8300000, guid: 423c1bc314d1b9e489d49d43bead2268, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    spatialBlend: 0
+    source: {fileID: 0}
   sfxs:
   - name: Jump
     clip: {fileID: 8300000, guid: 1e0f458c03810a14cb03aefbe90be619, type: 3}
@@ -4751,6 +4765,11 @@ MonoBehaviour:
     loop: 0
     spatialBlend: 0
     source: {fileID: 0}
+  sceneAudios:
+  - sceneName: Lobby
+    name: Linebeck
+  - sceneName: SideWorld
+    name: Grand Sea
   areaAudios: []
   battle: 0
   doPlay: 1

@@ -11,6 +11,8 @@ public class AudioManager : NetworkBehaviour
 
     public Sound[] sfxs;
 
+    public SceneAudio[] sceneAudios;
+
     public AreaAudio[] areaAudios;
 
     public static AudioManager instance;
@@ -18,6 +20,15 @@ public class AudioManager : NetworkBehaviour
     public bool battle = false;
 
     public bool doPlay = false;
+
+    public bool muteAudio = false;
+    public bool muteSFX = false;
+
+    private bool last_muteAudio = false;
+    private bool last_muteSFX = false;
+
+    public float standardAudioVolume = 1f;
+    public float standardSFXVolume = 0.6f;
 
     public string standardSoundTrack = "Vulcano";
 
@@ -62,11 +73,37 @@ public class AudioManager : NetworkBehaviour
 
     private void Start()
     {
-        Play(standardSoundTrack);
+        PlayAudio(standardSoundTrack);
     }
 
     private void Update()
     {
+        if (muteAudio && !last_muteAudio)
+        {
+            setVolumeAudioAll(0);
+        }
+        else
+        {
+            if (!muteAudio && last_muteAudio)
+            {
+                setVolumeAudioAll(standardAudioVolume);
+            }
+        }
+        if (muteSFX && !last_muteSFX)
+        {
+            setVolumeSFXAll(0);
+        }
+        else
+        {
+            if (!muteSFX && last_muteSFX)
+            {
+                setVolumeSFXAll(standardSFXVolume);
+            }
+        }
+
+        last_muteAudio = muteAudio;
+        last_muteSFX = muteSFX;
+
         if (doPlay)
         {
             if (battle)
@@ -75,16 +112,11 @@ public class AudioManager : NetworkBehaviour
                 if (s.source.isPlaying)
                     return;
 
-                stopAll();
+                stopAllSoundtrack();
 
-                Play("Oki_Doki!");
+                PlayAudio("Oki_Doki!");
 
                 return;
-            }
-
-            if(!isOnePlaying())
-            {
-                Play(standardSoundTrack);
             }
 
             foreach (AreaAudio aa in areaAudios)
@@ -99,15 +131,39 @@ public class AudioManager : NetworkBehaviour
                     Debug.Log(string.Format("Playing " + s.name + "   Player Position: {0},{1}", NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.x, NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.y));
 
 
-                    stopAll();
+                    stopAllSoundtrack();
 
-                    Play(aa.name);
+                    PlayAudio(aa.name);
+                    return;
                 }
+            }
+
+            foreach (SceneAudio sa in sceneAudios)
+            {
+                if (sa.shouldPlay())
+                {
+                    Sound s = Array.Find(sounds, sound => sound.name == sa.name);
+
+                    if (s.source.isPlaying)
+                        return;
+
+                    Debug.Log(string.Format("Playing " + s.name + " in Scene " + sa.sceneName)); //+ " Player Position: {0},{1}", NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.x, NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.y));
+
+                    stopAllSoundtrack();
+
+                    PlayAudio(sa.name);
+                    return;
+                }
+            }
+
+            if (!isOnePlaying())
+            {
+                PlayAudio(standardSoundTrack);
             }
         }
         else
         {
-            stopAll();
+            stopAllSoundtrack();
         }
     }
 
@@ -148,13 +204,28 @@ public class AudioManager : NetworkBehaviour
         s.source.Stop();
     }
 
-    public void stopAll()
+    public void stopAllSoundtrack(bool debug = true)
     {
+        if(debug) Debug.Log("Stopping All Soundtrack");
         foreach (Sound ss in sounds)
             ss.source.Stop();
     }
 
-    public void Play (string name)
+    public void stopAllSFX(bool debug = true)
+    {
+        if(debug) Debug.Log("Stopping All SFX");
+        foreach (Sound ss in sfxs)
+            ss.source.Stop();
+    }
+
+    public void stopAll()
+    {
+        Debug.Log("Stopping All Sound");
+        stopAllSoundtrack(false);
+        stopAllSFX(false);
+    }
+
+    public void PlayAudio(string name)
     {
         Sound s = Array.Find(sounds, sound => sound.name == name);
         if (s == null)
@@ -176,5 +247,43 @@ public class AudioManager : NetworkBehaviour
         }
         Debug.Log("Play SFX " + s.name);
         s.source.Play();
+    }
+
+    public void setVolumeAudio(string name, float volume)
+    {
+        Sound s = Array.Find(sounds, sound => sound.name == name);
+        if (s == null)
+        {
+            Debug.Log("Audio File not found");
+            return;
+        }
+        Debug.Log("Set Volume of Audio " + s.name + " to " + volume);
+        s.source.volume = volume;
+    }
+
+    public void setVolumeSFX(string name, float volume)
+    {
+        Sound s = Array.Find(sfxs, sound => sound.name == name);
+        if (s == null)
+        {
+            Debug.Log("SFX File not found");
+            return;
+        }
+        Debug.Log("Set Volume of SFX " + s.name + " to " + volume);
+        s.source.volume = volume;
+    }
+
+    public void setVolumeAudioAll(float volume)
+    {
+        Debug.Log("Set Volume of all Audio to " + volume);
+        foreach (Sound ss in sounds)
+            ss.source.volume = volume;
+    }
+
+    public void setVolumeSFXAll(float volume)
+    {
+        Debug.Log("Set Volume of all SFX to " + volume);
+        foreach (Sound ss in sfxs)
+            ss.source.volume = volume;
     }
 }
