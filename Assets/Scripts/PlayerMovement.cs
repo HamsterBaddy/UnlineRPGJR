@@ -7,12 +7,12 @@ using UnityEngine;
 //https://gamedevbeginner.com/how-to-jump-in-unity-with-or-without-physics/#jump_unity � jump based on this
 public class PlayerMovement : NetworkBehaviour
 {
-	//public NetworkVariable<bool>    side              = new(false);
-	public NetworkVariable<float>   gravity           = new(6f);
+	//public NetworkVariable<bool>    side            = new(false);
+	public NetworkVariable<float>   gravity				= new(6f);
 
-	public NetworkVariable<Vector2> moveinput         = new(new Vector2(0, 0));
-	public NetworkVariable<float>   jumpInput         = new(0f);
-	public NetworkVariable<bool> grounded = new(false);
+	public NetworkVariable<Vector2> moveinput			= new(new Vector2(0, 0), writePerm: NetworkVariableWritePermission.Owner);
+	public NetworkVariable<float>   jumpInput			= new(0f, writePerm: NetworkVariableWritePermission.Owner);
+	public NetworkVariable<bool>	grounded			= new(false, writePerm: NetworkVariableWritePermission.Owner);
 
 	//public NetworkVariable<float>   buttonTime        = new(0.5f);
 	//public NetworkVariable<float>   jumpHeight        = new(5);
@@ -35,7 +35,7 @@ public class PlayerMovement : NetworkBehaviour
 	public NetworkVariable<Vector2> offset            = new(new Vector2(0f,0.1f));
 	public NetworkVariable<float>   distanceRay        = new(0.1f);
 	public NetworkVariable<float> jumpStrength = new(24f);
-	public NetworkVariable<bool> jumping = new(false);
+	public NetworkVariable<bool> jumping = new(false, writePerm: NetworkVariableWritePermission.Owner);
 
 
 	//public NetworkVariable<Vector2> surfacePosition   = new();
@@ -47,7 +47,7 @@ public class PlayerMovement : NetworkBehaviour
 	//public NetworkVariable<int>     maxJumped         = new(3);
 
 	public NetworkVariable<float>   speed             = new(3f);
-	public NetworkVariable<bool>    notSlide          = new(false);
+	public NetworkVariable<bool>    notSlide          = new(false, writePerm : NetworkVariableWritePermission.Owner);
 	public NetworkVariable<Vector2> maxSpeed          = new(new Vector2(3, 3));
 	//public float drag = 5f;
 

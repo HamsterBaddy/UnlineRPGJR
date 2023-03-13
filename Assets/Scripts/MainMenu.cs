@@ -43,9 +43,6 @@ public class MainMenu : MonoBehaviour
 
 	private void Start()
 	{
-		NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
-		NetworkManager.Singleton.NetworkConfig.ClientConnectionBufferTimeout = 60;
-
 		NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
 		NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
@@ -62,6 +59,15 @@ public class MainMenu : MonoBehaviour
 
 	private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
 	{
+		if(NetworkManager.Singleton.IsHost)
+		{
+			response.Approved = true;
+		}
+		else
+		{
+			response.Pending = true;
+		}
+
 		NetworkLog.LogInfoServer("Received ConnectionRequest");
 		// The client identifier to be authenticated
 		ulong clientId = request.ClientNetworkId;
@@ -69,8 +75,7 @@ public class MainMenu : MonoBehaviour
 		// Additional connection data defined by user code
 		byte[] connectionData = request.Payload;
 
-		// Your approval logic determines the following values
-		response.Pending = true;
+		response.CreatePlayerObject = true;
 
 		string RequestString = $"Client-Id:{clientId}; {System.Text.Encoding.ASCII.GetString(connectionData)}";
 		Debug.Log("Requst-String: " + RequestString);
@@ -102,7 +107,6 @@ public class MainMenu : MonoBehaviour
 	{
 		NetworkLog.LogInfoServer("Accepting Join Request");
 		JoinResponse.Approved = true;
-		JoinResponse.CreatePlayerObject = true;
 		_StartGameButton.interactable = true;
 		JoinResponse.Pending = false;
 	}

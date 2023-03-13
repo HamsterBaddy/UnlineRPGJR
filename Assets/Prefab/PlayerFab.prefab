@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 7522266606965834433}
   - component: {fileID: 8142319658429930135}
   - component: {fileID: 3782062410147273636}
+  - component: {fileID: 991899558048088597}
+  - component: {fileID: -3375235347002625698}
   m_Layer: 3
   m_Name: PlayerFab
   m_TagString: Player
@@ -150,7 +152,7 @@ MonoBehaviour:
   - Lobby
   - Battle
   childsprite: {fileID: 6104882478789171893}
---- !u!114 &-4793046447176975537
+--- !u!114 &991899558048088597
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -176,7 +178,7 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
---- !u!114 &5077310615185311956
+--- !u!114 &-3375235347002625698
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
