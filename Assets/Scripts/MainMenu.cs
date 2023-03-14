@@ -1,28 +1,20 @@
 using System;
-using System.Net;
+using System.Collections;
+using System.Threading.Tasks;
 
 using TMPro;
 
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Unity.Services.Core;
-using Unity.Services.Authentication;
-using Unity.Services.Relay;
-using Unity.Services.Relay.Http;
-using Unity.Services.Relay.Models;
-using Unity.Networking.Transport;
-using Unity.Networking.Transport.Relay;
-using NetworkEvent = Unity.Networking.Transport.NetworkEvent;
-using UnityEngine.Rendering.LookDev;
 
 /// <summary>
 /// Enthält die Logik für das Hauptmenü und den Aufbau der Netzwerkverbindung
@@ -41,6 +33,9 @@ public class MainMenu : MonoBehaviour
 
 	[SerializeField] private TMP_Text       _JoinAnswerText;
 
+	[SerializeField] private Slider         _MasterVolumeSlider;
+	[SerializeField] private Slider         _MusicVolumeSlider;
+
 	private NetworkManager.ConnectionApprovalResponse JoinResponse = null;
 
 	private const int MaxConnections = 2;
@@ -58,6 +53,13 @@ public class MainMenu : MonoBehaviour
 		_StartGameButton.onClick.AddListener(StartGame);
 		_ExitAppButton.onClick.AddListener(ExitGame);
 		_AcceptJoinButton.onClick.AddListener(AcceptJoinGame);
+
+		_MasterVolumeSlider.onValueChanged.AddListener(MasterVolumeChanged);
+		_MusicVolumeSlider.onValueChanged.AddListener(MusicVolumeChanged);
+
+		_MasterVolumeSlider.value = ClientPrefs.GetMasterVolume();
+		_MusicVolumeSlider.value = ClientPrefs.GetMusicVolume();
+
 	}
 
 	private async void Start()
@@ -294,5 +296,15 @@ public class MainMenu : MonoBehaviour
 #else
 		Application.Quit();
 #endif
+	}
+
+	public void MasterVolumeChanged(float Volume)
+	{
+		ClientPrefs.SetMasterVolume(Volume);
+	}
+
+	public void MusicVolumeChanged(float Volume)
+	{
+		ClientPrefs.SetMusicVolume(Volume);
 	}
 }
