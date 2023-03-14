@@ -18,6 +18,7 @@ public static class ClientPrefs
 
 	const float k_DefaultMasterVolume = 0.5f;
 	const float k_DefaultMusicVolume = 0.8f;
+	const float k_DefaultSFXVolume = 1f;
 
 	public static float GetMasterVolume()
 	{
@@ -41,7 +42,7 @@ public static class ClientPrefs
 
 	public static float GetSFXVolume()
 	{
-		return PlayerPrefs.GetFloat(k_SFXVolumeKey, k_DefaultMusicVolume);
+		return PlayerPrefs.GetFloat(k_SFXVolumeKey, k_DefaultSFXVolume);
 	}
 
 	public static void SetSFXVolume(float volume)
