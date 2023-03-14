@@ -29,6 +29,10 @@ public class AudioManager : NetworkBehaviour
 	public float standardAudioVolume = 1f;
 	public float standardSFXVolume = 0.3f;
 
+	public float audioVolume = 1f;
+	public float SFXVolume = 0.3f;
+	public float masterVolume = 1f;
+
 	public string standardSoundTrack = "Vulcano";
 
 	// Start is called before the first frame update
@@ -78,7 +82,7 @@ public class AudioManager : NetworkBehaviour
 		{
 			if (!muteAudio && last_muteAudio)
 			{
-				setVolumeAudioAll(standardAudioVolume);
+				setVolumeAudioAll(audioVolume);
 			}
 		}
 		if (muteSFX && !last_muteSFX)
@@ -89,7 +93,7 @@ public class AudioManager : NetworkBehaviour
 		{
 			if (!muteSFX && last_muteSFX)
 			{
-				setVolumeSFXAll(standardSFXVolume);
+				setVolumeSFXAll(SFXVolume);
 			}
 		}
 
@@ -265,17 +269,32 @@ public class AudioManager : NetworkBehaviour
 		s.source.volume = volume;
 	}
 
-	public void setVolumeAudioAll(float volume)
+	public void setVolumeAudioAll(float volume, bool debug = true)
 	{
-		Debug.Log("Set Volume of all Audio to " + volume);
+		audioVolume = volume;
+		if (debug == true && debug != false)
+		{
+			Debug.Log("Set Volume of all Audio to " + volume);
+		}
 		foreach (Sound ss in Music)
 			ss.source.volume = volume;
 	}
 
-	public void setVolumeSFXAll(float volume)
+	public void setVolumeSFXAll(float volume, bool debug = true)
 	{
-		Debug.Log("Set Volume of all SFX to " + volume);
+		SFXVolume = volume;
+		if (debug == true && debug != false)
+		{
+			Debug.Log("Set Volume of all SFX to " + volume);
+		}
 		foreach (Sound ss in Sfxs)
 			ss.source.volume = volume;
+	}
+
+	public void setMasterVolume(float volume)
+	{
+		Debug.Log("Set Master Volume to " + volume);
+		setVolumeAudioAll(volume, false);
+		setVolumeSFXAll(volume, false);
 	}
 }
