@@ -4,6 +4,8 @@ using Unity.Netcode;
 
 using UnityEngine;
 
+using UnityEngine.InputSystem;
+
 //https://gamedevbeginner.com/how-to-jump-in-unity-with-or-without-physics/#jump_unity � jump based on this
 public class PlayerMovement : NetworkBehaviour
 {
@@ -11,7 +13,8 @@ public class PlayerMovement : NetworkBehaviour
 	public NetworkVariable<float>   gravity				= new(6f);
 
 	public NetworkVariable<Vector2> moveinput			= new(new Vector2(0, 0), writePerm: NetworkVariableWritePermission.Owner);
-	public NetworkVariable<float>   jumpInput			= new(0f, writePerm: NetworkVariableWritePermission.Owner);
+	public NetworkVariable<float>   jumpInput           = new(0f, writePerm: NetworkVariableWritePermission.Owner);
+	public NetworkVariable<float>   stompInput           = new(0f, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<bool>	grounded			= new(false, writePerm: NetworkVariableWritePermission.Owner);
 
 	//public NetworkVariable<float>   buttonTime        = new(0.5f);
@@ -54,40 +57,117 @@ public class PlayerMovement : NetworkBehaviour
 	public NetworkVariable<bool>    notSlide          = new(false, writePerm : NetworkVariableWritePermission.Owner);
 	public NetworkVariable<Vector2> maxSpeed          = new(new Vector2(3, 3));
 
+	public NetworkVariable<bool> isOld = new(false);
+	public NetworkVariable<bool> canStomping = new(false);
+	public NetworkVariable<bool> isStomping = new(false);
+	public NetworkVariable<bool> canJump = new(false);
+	public NetworkVariable<float> maxDurationStomp = new(0.6f);
+	public NetworkVariable<float> lastStompActivation = new(-1f);
+	public NetworkVariable<float> stompStrength = new(32f);
+	public NetworkVariable<float> waterSpeedSlowdownFactor = new(0.75f);
+	public NetworkVariable<bool> isCollidingWithSpikes = new(false);
+
+	public Animator animator;
+
+	public Controls controls;
+
+
+
+
 	//public float drag = 5f;
 
 	private Rigidbody2D rb;
 
+	private void Awake()
+	{
+		controls = new Controls();
+
+		controls.Player.Move.performed += ctx => Move(ctx.ReadValue<Vector2>());
+		controls.Player.Move.canceled += ctx => Move(ctx.ReadValue<Vector2>());
+
+		controls.Player.Jump.performed += ctx => Jump(ctx.ReadValue<float>());
+		controls.Player.Jump.canceled += ctx => Jump(ctx.ReadValue<float>());
+
+		controls.Player.Stomp.performed += ctx => Stomp(ctx.ReadValue<float>());
+		controls.Player.Stomp.canceled += ctx => Stomp(ctx.ReadValue<float>());
+	}
+
+	private void OnEnable()
+	{
+		controls.Player.Enable();
+	}
+
+	private void OnDisable()
+	{
+		controls.Player.Disable();
+	}
+
+	void Move(Vector2 input)
+	{
+		if (IsOwner)
+		{
+			moveinput.Value = input;
+		}
+	}
+
+	void Jump(float input)
+	{
+		if (IsOwner)
+		{
+			jumpInput.Value = input;
+		}
+	}
+
+	void Stomp(float input)
+	{
+		if (IsOwner)
+		{
+			stompInput.Value = input;
+		}
+	}
 
 	// Start is called before the first frame update
 	void Start()
 	{
 		rb = gameObject.GetComponent<Rigidbody2D>();
 		rb.gravityScale = gravity.Value;
+		animator = gameObject.GetComponent<Animator>();
 
 		lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
 
 		//initialJumpForce = jumpForce;
 
 	//side.OnValueChanged += onSideChange;
-}
+	}
+
+	public bool isGroundedMiddle()
+	{
+		RaycastHit2D hitMiddle = Physics2D.Raycast(new Vector2(GetComponent<Collider2D>().bounds.center.x, GetComponent<Collider2D>().bounds.center.y - GetComponent<Collider2D>().bounds.extents.y) - new Vector2(0, offset.Value.y), -Vector2.up, distanceRay.Value);
+		if (hitMiddle.collider == null) // || (hitMiddle.collider != null && hitMiddle.collider.tag != "Ground"))
+		{
+			return false;
+		}
+
+		return true;
+	}
 
 	public bool isGrounded()
     {
 		RaycastHit2D hitLeft = Physics2D.Raycast(new Vector2(GetComponent<Collider2D>().bounds.min.x, GetComponent<Collider2D>().bounds.min.y) - new Vector2(offset.Value.x, offset.Value.y), -Vector2.up, distanceRay.Value);
-		if (hitLeft.collider == null)
+		if (hitLeft.collider == null) //|| (hitLeft.collider != null && hitLeft.collider.tag != "Ground"))
 		{
 			RaycastHit2D hitRight = Physics2D.Raycast(new Vector2(GetComponent<Collider2D>().bounds.center.x + GetComponent<Collider2D>().bounds.extents.x, GetComponent<Collider2D>().bounds.center.y - GetComponent<Collider2D>().bounds.extents.y) + new Vector2(offset.Value.x, -offset.Value.y), -Vector2.up, distanceRay.Value);
-			if (hitRight.collider == null)
+			if (hitRight.collider == null) // || (hitRight.collider != null && hitRight.collider.tag != "Ground"))
 			{
 				RaycastHit2D hitMiddle = Physics2D.Raycast(new Vector2(GetComponent<Collider2D>().bounds.center.x, GetComponent<Collider2D>().bounds.center.y - GetComponent<Collider2D>().bounds.extents.y) - new Vector2(0, offset.Value.y), -Vector2.up, distanceRay.Value);
-				if (hitRight.collider == null)
+				if (hitMiddle.collider == null) // || (hitMiddle.collider != null && hitMiddle.collider.tag != "Ground"))
 				{
 					//Collider2D[] results = new Collider2D[3];
 					//int resultNumber = rb.OverlapCollider(new ContactFilter2D().NoFilter(),results);
 					//Debug.Log(resultNumber);
 					//if(resultNumber == 0)
 					//               {
+					grounded.Value = false;
 					return false;
      //               }
 				}
@@ -95,32 +175,194 @@ public class PlayerMovement : NetworkBehaviour
 		}
 
 		//if(!grounded.Value)
-  //      {
+		//      {
 		//	AudioManager.Instance.PlaySFX("Jump Landed");
-  //      }
+		//      }
 
-
+		grounded.Value = true;
 		return true;
 	}
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
+	private void OnCollisionEnter2D(Collision2D collision)
+	{
 		Debug.Log("Enter Coll 2D of " + collision.gameObject.tag + " is Grounded: " + grounded.Value + " | " + isGrounded());
-		if (grounded.Value && collision.gameObject.tag == "Ground")
+		if (isGrounded() && collision.gameObject.tag == "Ground")
 		{
-			lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
+			canJump.Value = true;
+			if (!isCollidingWithSpikes.Value && isGroundedMiddle())
+			{
+				lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
+			}
 			airtime.Value = -1;
+			lastStompActivation.Value = -1;
+
+			rb.velocity = Vector2.down * stompStrength.Value;
+			rb.inertia = 1;
+
 			AudioManager.Instance.PlaySFX("Jump Landed");
+		}
+
+		if (collision.gameObject.tag == "Spikes")
+		{
+			isCollidingWithSpikes.Value = true;
+
+			if (!isOld.Value)
+			{
+				//if ((collision.collider.ClosestPoint(gameObject.transform.position) - (new Vector2(gameObject.transform.position.x, gameObject.transform.position.y))).x < 0)
+				//{
+				//	gameObject.transform.position = lastGroundPosition.Value + new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+				//}
+				//else
+				//{
+				//	gameObject.transform.position = lastGroundPosition.Value - new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+				//}
+				gameObject.transform.position = lastGroundPosition.Value;
+				rb.velocity = Vector2.zero;
+				Debug.Log("here1");
+			}
+			else if (!canStomping.Value || (canStomping.Value && (!isStomping.Value && !(Time.realtimeSinceStartup - lastStompActivation.Value <= maxDurationStomp.Value))))
+			{
+				//if ((collision.collider.ClosestPoint(gameObject.transform.position) - (new Vector2(gameObject.transform.position.x, gameObject.transform.position.y))).x < 0)
+				//{
+				//	gameObject.transform.position = lastGroundPosition.Value + new Vector2(GetComponent<Collider2D>().bounds.size.x,0);
+				//}
+				//else
+				//{
+				//	gameObject.transform.position = lastGroundPosition.Value - new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+				//}
+				gameObject.transform.position = lastGroundPosition.Value;
+				rb.velocity = Vector2.zero;
+				Debug.Log("here2");
+			}
+			else if (isStomping.Value && isOld.Value && (Time.realtimeSinceStartup - lastStompActivation.Value <= maxDurationStomp.Value))
+			{
+				rb.velocity = Vector2.down * stompStrength.Value;
+				airtime.Value = Time.realtimeSinceStartup;
+				Debug.Log("here3");
+			}
+			else
+			{
+				Debug.Log("here4");
+				//if ((collision.collider.ClosestPoint(gameObject.transform.position) - (new Vector2(gameObject.transform.position.x, gameObject.transform.position.y))).x < 0)
+				//{
+				//	gameObject.transform.position = lastGroundPosition.Value + new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+				//}
+				//else
+				//{
+				//	gameObject.transform.position = lastGroundPosition.Value - new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+				//}
+				gameObject.transform.position = lastGroundPosition.Value;
+				rb.velocity = Vector2.zero;
+			}
 		}
 	}
 
 	private void OnCollisionExit2D(Collision2D collision)
 	{
+		if (collision.gameObject.tag == "Spikes")
+		{
+			isCollidingWithSpikes.Value = false;
+		}
+
+		canJump.Value = false;
+
 		Debug.Log("Exit Coll 2D of " + collision.gameObject.tag + " is Grounded: " + grounded.Value + " | " + isGrounded());
-		if(grounded.Value && collision.gameObject.tag == "Ground")
+		if(isGrounded() && collision.gameObject.tag == "Ground")
 		{
 			airtime.Value = Time.realtimeSinceStartup;
-			lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
+			if (!isCollidingWithSpikes.Value && isGroundedMiddle())
+			{
+				lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
+			}
+		}
+	}
+
+	private void OnCollisionStay2D(Collision2D collision)
+	{
+		if (collision.gameObject.tag == "Spikes")
+		{
+			isCollidingWithSpikes.Value = true;
+		}
+
+		//Debug.Log("Exit Coll 2D of " + collision.gameObject.tag + " is Grounded: " + grounded.Value + " | " + isGrounded());
+		if (isGrounded() && collision.gameObject.tag == "Ground")
+		{
+			canJump.Value = true;
+			airtime.Value = -1; 
+			lastStompActivation.Value = -1;
+			if (!isCollidingWithSpikes.Value && isGroundedMiddle())
+			{
+				lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
+			}
+		}
+	}
+
+	private void OnTriggerEnter2D(Collider2D collision)
+	{
+		if (collision.gameObject.tag == "Water")
+		{
+			if (!isOld.Value)
+			{
+				//if ((collision.ClosestPoint(gameObject.transform.position) - (new Vector2(gameObject.transform.position.x, gameObject.transform.position.y))).x < 0)
+				//{
+				//	gameObject.transform.position = lastGroundPosition.Value + new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+				//}
+				//else
+				//{
+				//	gameObject.transform.position = lastGroundPosition.Value - new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+				//}
+				gameObject.transform.position = lastGroundPosition.Value;
+				//rb.velocity = Vector2.zero;
+			}
+			else
+			{
+				maxSpeed.Value *= waterSpeedSlowdownFactor.Value;
+				speed.Value *= waterSpeedSlowdownFactor.Value;
+			}
+		}
+	}
+
+	private void OnTriggerStay2D(Collider2D collision)
+	{
+		if (collision.gameObject.tag == "Water")
+		{
+			if (!isOld.Value)
+			{
+				//if ((collision.ClosestPoint(gameObject.transform.position) - (new Vector2(gameObject.transform.position.x, gameObject.transform.position.y))).x < 0)
+				//{
+				//	gameObject.transform.position = lastGroundPosition.Value + new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+				//}
+				//else
+				//{
+				//	gameObject.transform.position = lastGroundPosition.Value - new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+				//}
+				gameObject.transform.position = lastGroundPosition.Value;
+				//rb.velocity = Vector2.zero;
+			}
+		}
+	}
+
+	private void OnTriggerExit2D(Collider2D collision)
+	{
+		if (collision.gameObject.tag == "Water")
+		{
+			if (!isOld.Value)
+			{
+				if ((collision.ClosestPoint(gameObject.transform.position) - (new Vector2(gameObject.transform.position.x, gameObject.transform.position.y))).x < 0)
+				{
+					gameObject.transform.position = lastGroundPosition.Value - new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+				}
+				else
+				{
+					gameObject.transform.position = lastGroundPosition.Value + new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+				}
+				//rb.velocity = Vector2.zero;
+			}
+			else
+			{
+				maxSpeed.Value /= waterSpeedSlowdownFactor.Value;
+				speed.Value /= waterSpeedSlowdownFactor.Value;
+			}
 		}
 	}
 
@@ -129,12 +371,21 @@ public class PlayerMovement : NetworkBehaviour
 	{
 		rb.gravityScale = gravity.Value;
 
-		grounded.Value = isGrounded();
+		isGrounded();
 
 		if(jumping.Value && rb.velocity.y < 0)
         {
 			jumping.Value = false;
         }
+
+		if(isStomping.Value && rb.velocity.y > 0)
+		{
+			isStomping.Value = false;
+		}
+		if(!isStomping.Value && rb.velocity.y <= 0)
+		{
+			lastStompActivation.Value = -1;
+		}
 
 		if(airtime.Value != -1)
 		{
@@ -142,7 +393,13 @@ public class PlayerMovement : NetworkBehaviour
 			{
 				airtime.Value = -1;
 				transform.position = lastGroundPosition.Value;
+				rb.velocity = Vector2.zero;
 			}
+		}
+		else
+		{
+			if(rb.velocity.y != 0)
+				airtime.Value = Time.realtimeSinceStartup;
 		}
 
 		//if(jumping.Value && rb.velocity.y <= 0)
@@ -239,9 +496,9 @@ public class PlayerMovement : NetworkBehaviour
 			//	falling.Value = false;
 			//}
 
-			moveinput.Value = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+			//moveinput.Value = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-			jumpInput.Value = Input.GetAxisRaw("Jump");
+			//jumpInput.Value = Input.GetAxisRaw("Jump");
 
 			//if (isGrounded() && jumpInput.Value != 0)
 			//{
@@ -274,12 +531,19 @@ public class PlayerMovement : NetworkBehaviour
 			//}
 		}
 
-		if(!jumping.Value && grounded.Value && jumpInput.Value != 0)
+		if(canJump.Value && !jumping.Value && grounded.Value && jumpInput.Value != 0)
         {
 			jumping.Value = true;
 			rb.velocity = new(rb.velocity.x,0);
 			rb.AddForce((Vector2.up * (jumpInput.Value * (jumpStrength.Value /* * (-1 * Physics2D.gravity.y * rb.gravityScale)*/))) /* * Time.deltaTime*/, ForceMode2D.Impulse);
 			AudioManager.Instance.PlaySFX("Jump");
+		}
+
+		if(isOld.Value && canStomping.Value && !grounded.Value && !isStomping.Value && lastStompActivation.Value == -1 && stompInput.Value > 0)
+		{
+			isStomping.Value = true;
+			rb.AddForce((Vector2.down * jumpStrength.Value), ForceMode2D.Impulse);
+			lastStompActivation.Value = Time.realtimeSinceStartup;
 		}
 
 		//if (isJumping && jumpTime >= maxJumpTime)
@@ -292,6 +556,11 @@ public class PlayerMovement : NetworkBehaviour
 		//}
 
 		//Debug.Log(jumpTime.Value + " | " + buttonTime.Value + " | " + falling.Value + " | " + jumping.Value);
+
+		animator.SetFloat("MoveInputX", moveinput.Value.x);
+		animator.SetFloat("JumpInput", Convert.ToSingle(jumping.Value));
+		animator.SetFloat("StompInput", Convert.ToSingle(isStomping.Value));
+		animator.SetFloat("Falling", Convert.ToSingle(rb.velocity.y < 0 && lastStompActivation.Value == -1));
 	}
 
 
