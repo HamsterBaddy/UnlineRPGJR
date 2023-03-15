@@ -38,11 +38,11 @@ public class PlayerMovement : NetworkBehaviour
 
 	public NetworkVariable<Vector2> offset            = new(new Vector2(0f,0.1f));
 	public NetworkVariable<float>   distanceRay        = new(0.1f);
-	public NetworkVariable<float> jumpStrength = new(24f);
+	public NetworkVariable<float> jumpStrength = new(24f, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<bool> jumping = new(false, writePerm: NetworkVariableWritePermission.Owner);
 
-	public NetworkVariable<Vector2> lastGroundPosition = new(Vector2.zero);
-	public NetworkVariable<float> airtime = new(-1f);
+	public NetworkVariable<Vector2> lastGroundPosition = new(Vector2.zero, writePerm: NetworkVariableWritePermission.Owner);
+	public NetworkVariable<float> airtime = new(-1f, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<float> maxFallTime = new(9f);
 
 
@@ -54,19 +54,19 @@ public class PlayerMovement : NetworkBehaviour
 	//public NetworkVariable<int>     jumped            = new(0);
 	//public NetworkVariable<int>     maxJumped         = new(3);
 
-	public NetworkVariable<float>   speed             = new(3f);
+	public NetworkVariable<float>   speed             = new(81f, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<bool>    notSlide          = new(false, writePerm : NetworkVariableWritePermission.Owner);
-	public NetworkVariable<Vector2> maxSpeed          = new(new Vector2(3, 3));
+	public NetworkVariable<Vector2> maxSpeed          = new(new Vector2(3, 3), writePerm: NetworkVariableWritePermission.Owner);
 
 	public NetworkVariable<bool> isOld = new(false);
-	public NetworkVariable<bool> canStomping = new(false);
-	public NetworkVariable<bool> isStomping = new(false);
-	public NetworkVariable<bool> canJump = new(false);
+	public NetworkVariable<bool> canStomping = new(false, writePerm: NetworkVariableWritePermission.Owner);
+	public NetworkVariable<bool> isStomping = new(false, writePerm: NetworkVariableWritePermission.Owner);
+	public NetworkVariable<bool> canJump = new(false, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<float> maxDurationStomp = new(0.6f);
-	public NetworkVariable<float> lastStompActivation = new(-1f);
+	public NetworkVariable<float> lastStompActivation = new(-1f, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<float> stompStrength = new(32f);
 	public NetworkVariable<float> waterSpeedSlowdownFactor = new(0.75f);
-	public NetworkVariable<bool> isCollidingWithSpikes = new(false);
+	public NetworkVariable<bool> isCollidingWithSpikes = new(false, writePerm: NetworkVariableWritePermission.Owner);
 
 	public NetworkVariable<float> runSpeedUpFactor = new(1.25f);
 
@@ -641,7 +641,7 @@ public class PlayerMovement : NetworkBehaviour
 		{
 			rb.AddForce(new Vector2(moveinput.Value.x * speed.Value * runSpeedUpFactor.Value, 0));
 
-			rb.velocity = new Vector2(Math.Sign(rb.velocity.x) * Math.Min(maxSpeed.Value.x, Math.Abs(rb.velocity.x)), rb.velocity.y);
+			rb.velocity = new Vector2(Math.Sign(rb.velocity.x) * Math.Min(maxSpeed.Value.x * runSpeedUpFactor.Value, Math.Abs(rb.velocity.x)), rb.velocity.y);
 		}
 	}
 }
