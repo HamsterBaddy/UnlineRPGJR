@@ -1,4 +1,4 @@
-﻿using UnityEngine.Audio;
+using UnityEngine.Audio;
 using System;
 using UnityEngine;
 using Unity.Netcode;
@@ -6,7 +6,7 @@ using Unity.Netcode;
 public class AudioManager : NetworkBehaviour
 {
 	private static AudioManager _instance;
-	public static AudioManager Instance { get => _instance; set { if (_instance != null) _instance = value; } }
+	public static AudioManager Instance { get => _instance; set { if (_instance == null) _instance = value; } }
 
 	public Sound[] Music;
 
@@ -129,7 +129,7 @@ public class AudioManager : NetworkBehaviour
 				{
 					Sound s = Array.Find(Music, sound => sound.name == aa.name);
 
-					if (s.source.isPlaying)
+					if (s == null || s.source.isPlaying)
 						return;
 
 					Debug.Log(string.Format("Playing " + s.name + "   Player Position: {0},{1}", NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.x, NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.y));
@@ -144,26 +144,19 @@ public class AudioManager : NetworkBehaviour
 
 			foreach (SceneAudio sa in sceneAudios)
 			{
-				try
+				if (sa.shouldPlay())
 				{
-					if (sa.shouldPlay())
-					{
-						Sound s = Array.Find(Music, sound => sound.name == sa.name);
+					Sound s = Array.Find(Music, sound => sound.name == sa.name);
 
-						if (s.source.isPlaying)
-							return;
-
-						Debug.Log(string.Format("Playing " + s.name + " in Scene " + sa.sceneName)); //+ " Player Position: {0},{1}", NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.x, NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.y));
-
-						stopAllSoundtrack();
-
-						PlayAudio(sa.name);
+					if (s == null || s.source.isPlaying)
 						return;
-					}
-				}
-				catch (System.NullReferenceException e)
-				{
-					
+
+					Debug.Log(string.Format("Playing " + s.name + " in Scene " + sa.sceneName)); //+ " Player Position: {0},{1}", NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.x, NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.y));
+
+					stopAllSoundtrack();
+
+					PlayAudio(sa.name);
+					return;
 				}
 			}
 
@@ -288,7 +281,7 @@ public class AudioManager : NetworkBehaviour
 	{
 		audioVolume = volume;
 		ClientPrefs.SetMusicVolume(volume);
-		if (debug == true && debug != false)
+		if (debug)
 		{
 			Debug.Log("Set Volume of all Audio to " + volume);
 		}
@@ -300,7 +293,7 @@ public class AudioManager : NetworkBehaviour
 	{
 		SFXVolume = volume;
 		ClientPrefs.SetSFXVolume(volume);
-		if (debug == true && debug != false)
+		if (debug)
 		{
 			Debug.Log("Set Volume of all SFX to " + volume);
 		}

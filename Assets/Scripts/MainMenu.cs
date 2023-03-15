@@ -35,6 +35,7 @@ public class MainMenu : MonoBehaviour
 
 	[SerializeField] private Slider         _MasterVolumeSlider;
 	[SerializeField] private Slider         _MusicVolumeSlider;
+	[SerializeField] private Slider         _SFXVolumeSlider;
 
 	private NetworkManager.ConnectionApprovalResponse JoinResponse = null;
 
@@ -59,12 +60,13 @@ public class MainMenu : MonoBehaviour
 
 		_MasterVolumeSlider.value = ClientPrefs.GetMasterVolume();
 		_MusicVolumeSlider.value = ClientPrefs.GetMusicVolume();
+		_SFXVolumeSlider.value = ClientPrefs.GetSFXVolume();
 
 	}
 
 	private async void Start()
 	{
-		NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
+		//NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
 		NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
 
@@ -306,5 +308,9 @@ public class MainMenu : MonoBehaviour
 	public void MusicVolumeChanged(float Volume)
 	{
 		ClientPrefs.SetMusicVolume(Volume);
+	}
+	public void SFXVolumeChanged(float Volume)
+	{
+		ClientPrefs.SetSFXVolume(Volume);
 	}
 }
