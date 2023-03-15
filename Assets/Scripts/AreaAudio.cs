@@ -11,11 +11,14 @@ public class AreaAudio
 
 	public bool inside(GameObject player)
 	{
-		for (int i = 0; i < 2; ++i)
+		if (player != null)
 		{
-			if (player?.transform.position[i] >= minPosition[i] && player?.transform.position[i] <= maxPosition[i])
+			for (int i = 0; i < 2; ++i)
 			{
-				return true;
+				if (player.transform.position[i] >= minPosition[i] && player.transform.position[i] <= maxPosition[i])
+				{
+					return true;
+				}
 			}
 		}
 		return false;
