@@ -251,6 +251,8 @@ MonoBehaviour:
   _AcceptJoinButton: {fileID: 1317200189}
   _JoinRequestText: {fileID: 1231098044}
   _JoinAnswerText: {fileID: 1731515873}
+  _MasterVolumeSlider: {fileID: 0}
+  _MusicVolumeSlider: {fileID: 0}
 --- !u!1 &121068976
 GameObject:
   m_ObjectHideFlags: 0
@@ -2061,7 +2063,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2271,8 +2273,8 @@ RectTransform:
   m_Father: {fileID: 711231024}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4256,8 +4258,8 @@ RectTransform:
   m_Father: {fileID: 1968561492}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4351,7 +4353,7 @@ GameObject:
   m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1415248744
 Transform:
   m_ObjectHideFlags: 0
@@ -4965,7 +4967,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -5805,50 +5807,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 027901adbbf705841a9b8a38a5988f25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sounds:
-  - name: Oki_Doki!
-    clip: {fileID: 8300000, guid: 012503b2976435843ae92d24d2a43ba5, type: 3}
-    volume: 1
-    pitch: 1
-    loop: 1
-    spatialBlend: 0
-    source: {fileID: 0}
-  - name: Vulcano
-    clip: {fileID: 8300000, guid: e03486c0400127e498e76700bc8898df, type: 3}
-    volume: 1
-    pitch: 1
-    loop: 1
-    spatialBlend: 0
-    source: {fileID: 0}
-  - name: Linebeck
-    clip: {fileID: 8300000, guid: b2f53696349322746b33d4d576d33b83, type: 3}
-    volume: 1
-    pitch: 1
-    loop: 1
-    spatialBlend: 0
-    source: {fileID: 0}
-  - name: Grand Sea
-    clip: {fileID: 8300000, guid: 423c1bc314d1b9e489d49d43bead2268, type: 3}
-    volume: 1
-    pitch: 1
-    loop: 1
-    spatialBlend: 0
-    source: {fileID: 0}
-  sfxs:
-  - name: Jump
-    clip: {fileID: 8300000, guid: 1e0f458c03810a14cb03aefbe90be619, type: 3}
-    volume: 1
-    pitch: 1
-    loop: 0
-    spatialBlend: 0
-    source: {fileID: 0}
-  - name: Jump Landed
-    clip: {fileID: 8300000, guid: 1e0f458c03810a14cb03aefbe90be619, type: 3}
-    volume: 1
-    pitch: 1
-    loop: 0
-    spatialBlend: 0
-    source: {fileID: 0}
+  Music: []
+  Sfxs: []
   sceneAudios:
   - sceneName: Lobby
     name: Linebeck
@@ -5861,6 +5821,10 @@ MonoBehaviour:
   muteSFX: 0
   standardAudioVolume: 1
   standardSFXVolume: 0.3
+  standardMasterVolume: 1
+  audioVolume: 1
+  SFXVolume: 0.3
+  masterVolume: 1
   standardSoundTrack: Vulcano
 --- !u!114 &8043588073865034063
 MonoBehaviour:

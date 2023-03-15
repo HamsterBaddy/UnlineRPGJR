@@ -36,10 +36,14 @@ public class AudioManager : NetworkBehaviour
 
 	public string standardSoundTrack = "Vulcano";
 
+	AudioManager()
+	{
+		Instance = this;
+	}
+
 	// Start is called before the first frame update
 	void Awake()
 	{
-		Instance = this;
 
 		DontDestroyOnLoad(gameObject);
 
@@ -140,19 +144,26 @@ public class AudioManager : NetworkBehaviour
 
 			foreach (SceneAudio sa in sceneAudios)
 			{
-				if (sa.shouldPlay())
+				try
 				{
-					Sound s = Array.Find(Music, sound => sound.name == sa.name);
+					if (sa.shouldPlay())
+					{
+						Sound s = Array.Find(Music, sound => sound.name == sa.name);
 
-					if (s.source.isPlaying)
+						if (s.source.isPlaying)
+							return;
+
+						Debug.Log(string.Format("Playing " + s.name + " in Scene " + sa.sceneName)); //+ " Player Position: {0},{1}", NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.x, NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.y));
+
+						stopAllSoundtrack();
+
+						PlayAudio(sa.name);
 						return;
-
-					Debug.Log(string.Format("Playing " + s.name + " in Scene " + sa.sceneName)); //+ " Player Position: {0},{1}", NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.x, NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform.position.y));
-
-					stopAllSoundtrack();
-
-					PlayAudio(sa.name);
-					return;
+					}
+				}
+				catch (System.NullReferenceException e)
+				{
+					
 				}
 			}
 
