@@ -15,6 +15,7 @@ public class PlayerMovement : NetworkBehaviour
 	public NetworkVariable<Vector2> moveinput			= new(new Vector2(0, 0), writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<float>   jumpInput           = new(0f, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<float>   stompInput           = new(0f, writePerm: NetworkVariableWritePermission.Owner);
+	public NetworkVariable<float>   RunInput           = new(0f, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<bool>	grounded			= new(false, writePerm: NetworkVariableWritePermission.Owner);
 
 	//public NetworkVariable<float>   buttonTime        = new(0.5f);
@@ -67,6 +68,8 @@ public class PlayerMovement : NetworkBehaviour
 	public NetworkVariable<float> waterSpeedSlowdownFactor = new(0.75f);
 	public NetworkVariable<bool> isCollidingWithSpikes = new(false);
 
+	public NetworkVariable<float> runSpeedUpFactor = new(1.25f);
+
 	public Animator animator;
 
 	public Controls controls;
@@ -90,6 +93,9 @@ public class PlayerMovement : NetworkBehaviour
 
 		controls.Player.Stomp.performed += ctx => Stomp(ctx.ReadValue<float>());
 		controls.Player.Stomp.canceled += ctx => Stomp(ctx.ReadValue<float>());
+
+		controls.Player.Run.performed += ctx => Run(ctx.ReadValue<float>());
+		controls.Player.Run.canceled += ctx => Run(ctx.ReadValue<float>());
 	}
 
 	private void OnEnable()
@@ -123,6 +129,14 @@ public class PlayerMovement : NetworkBehaviour
 		if (IsOwner)
 		{
 			stompInput.Value = input;
+		}
+	}
+
+	void Run(float input)
+	{
+		if (IsOwner)
+		{
+			RunInput.Value = input;
 		}
 	}
 
@@ -560,6 +574,7 @@ public class PlayerMovement : NetworkBehaviour
 		animator.SetFloat("MoveInputX", moveinput.Value.x);
 		animator.SetFloat("JumpInput", Convert.ToSingle(jumping.Value));
 		animator.SetFloat("StompInput", Convert.ToSingle(isStomping.Value));
+		animator.SetFloat("RunInput", Convert.ToSingle(RunInput.Value));
 		animator.SetFloat("Falling", Convert.ToSingle(rb.velocity.y < 0 && lastStompActivation.Value == -1));
 	}
 
@@ -616,8 +631,17 @@ public class PlayerMovement : NetworkBehaviour
 			rb.velocity = new Vector2(0, rb.velocity.y);
 		}
 
-		rb.AddForce(new Vector2(moveinput.Value.x * speed.Value, 0));
+		if (RunInput.Value < 0.1)
+		{
+			rb.AddForce(new Vector2(moveinput.Value.x * speed.Value, 0));
 
-		rb.velocity = new Vector2(Math.Sign(rb.velocity.x) * Math.Min(maxSpeed.Value.x, Math.Abs(rb.velocity.x)), rb.velocity.y);
+			rb.velocity = new Vector2(Math.Sign(rb.velocity.x) * Math.Min(maxSpeed.Value.x, Math.Abs(rb.velocity.x)), rb.velocity.y);
+		}
+		else
+		{
+			rb.AddForce(new Vector2(moveinput.Value.x * speed.Value * runSpeedUpFactor.Value, 0));
+
+			rb.velocity = new Vector2(Math.Sign(rb.velocity.x) * Math.Min(maxSpeed.Value.x, Math.Abs(rb.velocity.x)), rb.velocity.y);
+		}
 	}
 }
