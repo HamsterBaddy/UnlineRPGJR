@@ -215,6 +215,14 @@ public class AudioManager : NetworkBehaviour
 		s.source.Stop();
 	}
 
+	public void stopAllSounds(Sound[] soundArray)
+	{
+		foreach (Sound sound in audio)
+		{
+			sound.source.Stop();
+		}
+	}
+
 	public void stopAllSoundtrack(bool debug = true)
 	{
 		if (debug) Debug.Log("Stopping All Soundtrack");
@@ -232,8 +240,9 @@ public class AudioManager : NetworkBehaviour
 	public void stopAll()
 	{
 		Debug.Log("Stopping All Sound");
-		stopAllSoundtrack(false);
-		stopAllSFX(false);
+		stopAllSounds(Music);
+		stopAllSounds(Sfxs);
+
 	}
 
 	public void PlayAudio(string name)
