@@ -28,6 +28,7 @@ public class AudioManager : NetworkBehaviour
 
 	public float standardAudioVolume = 1f;
 	public float standardSFXVolume = 0.3f;
+	public float standardMasterVolume = 1f;
 
 	public float audioVolume = 1f;
 	public float SFXVolume = 0.3f;
@@ -69,6 +70,9 @@ public class AudioManager : NetworkBehaviour
 
 	private void Start()
 	{
+		masterVolume = ClientPrefs.GetMasterVolume();
+		audioVolume = ClientPrefs.GetMusicVolume();
+		SFXVolume = ClientPrefs.GetSFXVolume();
 		PlayAudio(standardSoundTrack);
 	}
 
@@ -272,29 +276,33 @@ public class AudioManager : NetworkBehaviour
 	public void setVolumeAudioAll(float volume, bool debug = true)
 	{
 		audioVolume = volume;
+		ClientPrefs.SetMusicVolume(volume);
 		if (debug == true && debug != false)
 		{
 			Debug.Log("Set Volume of all Audio to " + volume);
 		}
 		foreach (Sound ss in Music)
-			ss.source.volume = volume;
+			ss.source.volume = volume * masterVolume;
 	}
 
 	public void setVolumeSFXAll(float volume, bool debug = true)
 	{
 		SFXVolume = volume;
+		ClientPrefs.SetSFXVolume(volume);
 		if (debug == true && debug != false)
 		{
 			Debug.Log("Set Volume of all SFX to " + volume);
 		}
 		foreach (Sound ss in Sfxs)
-			ss.source.volume = volume;
+			ss.source.volume = volume * masterVolume;
 	}
 
 	public void setMasterVolume(float volume)
 	{
+		ClientPrefs.SetMasterVolume(volume);
 		Debug.Log("Set Master Volume to " + volume);
-		setVolumeAudioAll(volume, false);
-		setVolumeSFXAll(volume, false);
+		masterVolume = volume;
+		setVolumeAudioAll(audioVolume, false);
+		setVolumeSFXAll(SFXVolume, false);
 	}
 }

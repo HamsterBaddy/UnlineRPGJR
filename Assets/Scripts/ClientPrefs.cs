@@ -16,37 +16,36 @@ public static class ClientPrefs
 	const string k_SFXVolumeKey = "SFXVolume";
 	const string k_ClientGUIDKey = "client_guid";
 
-	const float k_DefaultMasterVolume = 0.5f;
-	const float k_DefaultMusicVolume = 0.8f;
-	const float k_DefaultSFXVolume = 1f;
-
 	public static float GetMasterVolume()
 	{
-		return PlayerPrefs.GetFloat(k_MasterVolumeKey, k_DefaultMasterVolume);
+		return PlayerPrefs.GetFloat(k_MasterVolumeKey, AudioManager.Instance.standardMasterVolume);
 	}
 
 	public static void SetMasterVolume(float volume)
 	{
+		//AudioManager.Instance.setMasterVolume(volume);
 		PlayerPrefs.SetFloat(k_MasterVolumeKey, volume);
 	}
 
 	public static float GetMusicVolume()
 	{
-		return PlayerPrefs.GetFloat(k_MusicVolumeKey, k_DefaultMusicVolume);
+		return PlayerPrefs.GetFloat(k_MusicVolumeKey, AudioManager.Instance.standardAudioVolume);
 	}
 
 	public static void SetMusicVolume(float volume)
 	{
+		//AudioManager.Instance.setVolumeAudioAll(volume);
 		PlayerPrefs.SetFloat(k_MusicVolumeKey, volume);
 	}
 
 	public static float GetSFXVolume()
 	{
-		return PlayerPrefs.GetFloat(k_SFXVolumeKey, k_DefaultSFXVolume);
+		return PlayerPrefs.GetFloat(k_SFXVolumeKey, AudioManager.Instance.standardSFXVolume);
 	}
 
 	public static void SetSFXVolume(float volume)
 	{
+		//AudioManager.Instance.setVolumeSFXAll(volume);
 		PlayerPrefs.SetFloat(k_SFXVolumeKey, volume);
 	}
 
