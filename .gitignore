@@ -71,10 +71,15 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-#Debug Files
+# Debug Files
 /[Mm]ono[Bb]leeding[Ee]dge
 /OnlineRPGJR_Data
 /OnlineRPGJR_BurstDebugInformation_DoNotShip
 /Testbuild
 Assets/Characters.rar.meta
 Assets/Characters.rar
+
+# Archives
+*.rar.meta
+*.rar
+*.zip
