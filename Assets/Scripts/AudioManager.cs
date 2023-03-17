@@ -36,14 +36,11 @@ public class AudioManager : NetworkBehaviour
 
 	public string standardSoundTrack = "Vulcano";
 
-	AudioManager()
-	{
-		Instance = this;
-	}
 
 	// Start is called before the first frame update
 	void Awake()
 	{
+		Instance = this;
 
 		DontDestroyOnLoad(gameObject);
 
@@ -125,7 +122,7 @@ public class AudioManager : NetworkBehaviour
 
 			foreach (AreaAudio aa in areaAudios)
 			{
-				if (aa.inside(NetworkManager.Singleton.LocalClient.PlayerObject.gameObject))
+				if (aa.inside(NetworkManager.Singleton?.LocalClient?.PlayerObject?.gameObject))
 				{
 					Sound s = Array.Find(Music, sound => sound.name == aa.name);
 

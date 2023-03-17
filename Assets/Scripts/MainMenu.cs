@@ -79,10 +79,6 @@ public class MainMenu : NetworkBehaviour
 		_BackToMainMenuFromHostingButton.onClick.AddListener(BackToMainMenuFromHosting);
 		_BackToMainMenuFromJoiningButton.onClick.AddListener(BackToMainMenuFromJoining);
 
-		_MasterVolumeSlider.onValueChanged.AddListener(MasterVolumeChanged);
-		_MusicVolumeSlider.onValueChanged.AddListener(MusicVolumeChanged);
-		_SFXVolumeSlider.onValueChanged.AddListener(SFXVolumeChanged);
-
 		_InputSchemaButton.onClick.AddListener(ChangeControlSchema);
 
 		_MasterVolumeSlider.value = ClientPrefs.GetMasterVolume();
@@ -90,6 +86,11 @@ public class MainMenu : NetworkBehaviour
 		_SFXVolumeSlider.value = ClientPrefs.GetSFXVolume();
 		PlayerMovement.useKeyboard = ClientPrefs.GetControlSchema();
 		UpdateControlSchemaText();
+
+
+		_MasterVolumeSlider.onValueChanged.AddListener(MasterVolumeChanged);
+		_MusicVolumeSlider.onValueChanged.AddListener(MusicVolumeChanged);
+		_SFXVolumeSlider.onValueChanged.AddListener(SFXVolumeChanged);
 	}
 
 	private async void Start()
@@ -245,7 +246,7 @@ public class MainMenu : NetworkBehaviour
 		{
 			if (obj != NetworkManager.LocalClientId)
 			{
-				_BeigetreneSpielerText.text = "Spieler Zwei ist Beigetreten";
+				_BeigetreneSpielerText.text = "Player Two Joined";
 				_StartGameButton.interactable = true;
 			}
 		}
@@ -283,7 +284,7 @@ public class MainMenu : NetworkBehaviour
 	/// </summary>
 	public void JoinGame()
 	{
-		Debug.Log($"Eingegebene Ip-Adresse: {_JoinCodeField.text}");
+		Debug.Log($"Entered Join Code: {_JoinCodeField.text}");
 		//Debug.Log($"Eingegebener Port: {_PortField.text}");
 
 		//if (IPAddress.TryParse(_IPAdressField.text, out _) && ushort.TryParse(_PortField.text, out ushort Parsed_Port))
@@ -301,6 +302,7 @@ public class MainMenu : NetworkBehaviour
 
 		_RegionsDropdown.interactable = false;
 
+
 		StartCoroutine(ConfigureTransportAndStartNgoAsConnectingPlayer(_JoinCodeField.text));
 
 		//NetworkLog.LogInfoServer($"Trying To Connect To Server; Connectiondata: {connectionData}");
@@ -311,6 +313,11 @@ public class MainMenu : NetworkBehaviour
 
 	public async Task<RelayServerData> JoinRelayServerFromJoinCode(string joinCode)
 	{
+		if (UnityServices.State == ServicesInitializationState.Uninitialized)
+		{
+			await UnityServices.InitializeAsync();
+		}
+
 		JoinAllocation allocation;
 		try
 		{
@@ -386,8 +393,8 @@ public class MainMenu : NetworkBehaviour
 		//foreach (KeyValuePair<ulong, NetworkClient> a in NetworkManager.Singleton.ConnectedClients)
 		//	NetworkManager.Singleton.DisconnectClient(a.Value.ClientId, "Der Host hat den Server beendet");
 		NetworkManager.Singleton.Shutdown();
-		_JoinCodeTextText.text = "Beitrittscode wird generiert";
-		_BeigetreneSpielerText.text = "Warte auf Spieler";
+		_JoinCodeTextText.text = "Join Code is being Generated";
+		_BeigetreneSpielerText.text = "Waiting for Players";
 		_JoinCodeField.text = string.Empty;
 	}
 
@@ -396,8 +403,8 @@ public class MainMenu : NetworkBehaviour
 		//foreach (KeyValuePair<ulong, NetworkClient> a in NetworkManager.Singleton.ConnectedClients)
 		//	NetworkManager.Singleton.DisconnectClient(a.Value.ClientId, "Der Host hat den Server beendet");
 		NetworkManager.Singleton.Shutdown();
-		_JoinCodeTextText.text = "Beitrittscode wird generiert";
-		_BeigetreneSpielerText.text = "Warte auf Spieler";
+		_JoinCodeTextText.text = "Join Code is being Generated";
+		_BeigetreneSpielerText.text = "Waiting for Players";
 		_JoinCodeField.text = string.Empty;
 	}
 
