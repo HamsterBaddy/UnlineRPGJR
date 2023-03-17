@@ -75,6 +75,10 @@ crashlytics-build.properties
 /[Mm]ono[Bb]leeding[Ee]dge
 /OnlineRPGJR_Data
 /OnlineRPGJR_BurstDebugInformation_DoNotShip
+/UnlineJR_Data
+/UnlineJR_BurstDebugInformation_DoNotShip
 /Testbuild
 Assets/Characters.rar.meta
 Assets/Characters.rar
+Assets/Samples
+Samples.meta

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using TMPro;
@@ -21,47 +22,53 @@ using UnityEngine.UI;
 /// </summary>
 public class MainMenu : MonoBehaviour
 {
-	[SerializeField] private TMP_InputField _IPAdressField;
-	[SerializeField] private TMP_InputField _PortField;
-	[SerializeField] private Button         _JoinGameButton;
+
+	[SerializeField] private TMP_InputField _UserNameField;
+
+	[SerializeField] private TMP_InputField _JoinCodeField;
+
+	[SerializeField] private Button         _JoinGameMainMenuGameButton;
 	[SerializeField] private Button         _HostGameButton;
 	[SerializeField] private Button         _ExitAppButton;
 
 	[SerializeField] private Button         _StartGameButton;
-	[SerializeField] private Button         _AcceptJoinButton;
-	[SerializeField] private TMP_Text       _JoinRequestText;
+	[SerializeField] private TMP_Text       _JoinCodeTextText;
+	[SerializeField] private TMP_Text       _BeigetreneSpielerText;
 
 	[SerializeField] private TMP_Text       _JoinAnswerText;
+	[SerializeField] private Button         _JoinGameButton;
 
 	[SerializeField] private Slider         _MasterVolumeSlider;
 	[SerializeField] private Slider         _MusicVolumeSlider;
 	[SerializeField] private Slider         _SFXVolumeSlider;
 
-	private NetworkManager.ConnectionApprovalResponse JoinResponse = null;
+	[SerializeField] private TMP_Dropdown   _RegionsDropdown;
+
+	//private NetworkManager.ConnectionApprovalResponse JoinResponse = null;
 
 	private const int MaxConnections = 2;
 
 	private RelayServerData relayServerData;
-	private string PlayerId;
 
 	/// <summary>
 	/// Initialises Click-Listeners
 	/// </summary>
 	private void Awake()
 	{
+		_UserNameField.onValueChanged.AddListener(UserNameChanged);
+
 		_HostGameButton.onClick.AddListener(HostGame);
 		_JoinGameButton.onClick.AddListener(JoinGame);
 		_StartGameButton.onClick.AddListener(StartGame);
 		_ExitAppButton.onClick.AddListener(ExitGame);
-		_AcceptJoinButton.onClick.AddListener(AcceptJoinGame);
 
 		_MasterVolumeSlider.onValueChanged.AddListener(MasterVolumeChanged);
 		_MusicVolumeSlider.onValueChanged.AddListener(MusicVolumeChanged);
+		_SFXVolumeSlider.onValueChanged.AddListener(SFXVolumeChanged);
 
 		_MasterVolumeSlider.value = ClientPrefs.GetMasterVolume();
 		_MusicVolumeSlider.value = ClientPrefs.GetMusicVolume();
 		_SFXVolumeSlider.value = ClientPrefs.GetSFXVolume();
-
 	}
 
 	private async void Start()
@@ -84,9 +91,21 @@ public class MainMenu : MonoBehaviour
 				AuthenticationService.Instance.SwitchProfile($"Clone_{customArgument}_Profile");
 			}
 #endif
+
 			await AuthenticationService.Instance.SignInAnonymouslyAsync();
-			PlayerId = AuthenticationService.Instance.PlayerId;
-			_JoinAnswerText.text = PlayerId;
+
+			List<Region> allRegions = await RelayService.Instance.ListRegionsAsync();
+
+			List<string> RegionNames = new();
+
+			foreach (Region region in allRegions)
+			{
+				Debug.Log($"Region: {region.Id}: {region.Description}");
+				RegionNames.Add(region.Id);
+			}
+			_RegionsDropdown.options.Clear();
+			_RegionsDropdown.AddOptions(RegionNames);
+
 		}
 		catch (Exception ex)
 		{
@@ -101,13 +120,13 @@ public class MainMenu : MonoBehaviour
 	/// </summary>
 	public void HostGame()
 	{
-		StartCoroutine(Example_ConfigureTransportAndStartNgoAsHost());
-
+		StartCoroutine(ConfigureTransportAndStartNgoAsHost());
+		_RegionsDropdown.interactable = false;
 	}
 
-	IEnumerator Example_ConfigureTransportAndStartNgoAsHost()
+	IEnumerator ConfigureTransportAndStartNgoAsHost()
 	{
-		Task<(RelayServerData, string)> serverRelayUtilityTask = AllocateRelayServerAndGetJoinCode(MaxConnections);
+		Task<(RelayServerData, string)> serverRelayUtilityTask = AllocateRelayServerAndGetJoinCode(MaxConnections/*, _RegionsDropdown.options[_RegionsDropdown.value].text*/);
 		while (!serverRelayUtilityTask.IsCompleted)
 		{
 			yield return null;
@@ -123,7 +142,7 @@ public class MainMenu : MonoBehaviour
 
 
 		// Display the joinCode to the user.
-		_JoinRequestText.text = relayServerDataAndJoinCode.Item2;
+		_JoinCodeTextText.text = relayServerDataAndJoinCode.Item2;
 
 		NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerDataAndJoinCode.Item1);
 		NetworkManager.Singleton.StartHost();
@@ -153,42 +172,42 @@ public class MainMenu : MonoBehaviour
 			createJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 			Debug.Log(createJoinCode);
 		}
-		catch
+		catch (Exception ex)
 		{
-			Debug.LogError("Relay create join code request failed");
+			Debug.LogError("Relay create join code request failed: " + ex);
 			throw;
 		}
 
 		return (new RelayServerData(allocation, "dtls"), createJoinCode);
 	}
 
-	private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
-	{
-		if (NetworkManager.Singleton.IsHost)
-		{
-			response.Approved = true;
-		}
-		else
-		{
-			response.Pending = true;
-		}
+	//private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+	//{
+	//	if (NetworkManager.Singleton.IsHost)
+	//	{
+	//		response.Approved = true;
+	//	}
+	//	else
+	//	{
+	//		response.Pending = true;
+	//	}
 
-		NetworkLog.LogInfoServer("Received ConnectionRequest");
-		// The client identifier to be authenticated
-		ulong clientId = request.ClientNetworkId;
+	//	NetworkLog.LogInfoServer("Received ConnectionRequest");
+	//	// The client identifier to be authenticated
+	//	ulong clientId = request.ClientNetworkId;
 
-		// Additional connection data defined by user code
-		byte[] connectionData = request.Payload;
+	//	// Additional connection data defined by user code
+	//	byte[] connectionData = request.Payload;
 
-		response.CreatePlayerObject = true;
+	//	response.CreatePlayerObject = true;
 
-		string RequestString = $"Client-Id:{clientId}; {System.Text.Encoding.ASCII.GetString(connectionData)}";
-		Debug.Log("Requst-String: " + RequestString);
+	//	string RequestString = $"Client-Id:{clientId}; {System.Text.Encoding.ASCII.GetString(connectionData)}";
+	//	Debug.Log("Requst-String: " + RequestString);
 
-		_JoinAnswerText.text += RequestString;
-		JoinResponse = response;
-		_AcceptJoinButton.interactable = true;
-	}
+	//	_JoinAnswerText.text += RequestString;
+	//	JoinResponse = response;
+	//	_AcceptJoinButton.interactable = true;
+	//}
 
 	private void OnClientDisconnectCallback(ulong obj)
 	{
@@ -201,19 +220,15 @@ public class MainMenu : MonoBehaviour
 
 	private void OnClientConnectedCallback(ulong obj)
 	{
-		_JoinAnswerText.text += "Server Approved Connection";
-		NetworkLog.LogInfoServer($"Connected On Client {NetworkManager.Singleton.LocalClientId}");
-	}
-
-	/// <summary>
-	/// Listener für Accept-Join-Button
-	/// </summary>
-	public void AcceptJoinGame()
-	{
-		NetworkLog.LogInfoServer("Accepting Join Request");
-		JoinResponse.Approved = true;
-		_StartGameButton.interactable = true;
-		JoinResponse.Pending = false;
+		if (NetworkManager.Singleton.IsServer)
+		{
+			//_BeigetreneSpielerText.text += ;
+		}
+		else
+		{
+			_JoinAnswerText.text += "Server Approved Connection";
+			NetworkLog.LogInfoServer($"Connected On Client {NetworkManager.Singleton.LocalClientId}");
+		}
 	}
 
 	/// <summary>
@@ -230,8 +245,8 @@ public class MainMenu : MonoBehaviour
 	/// </summary>
 	public void JoinGame()
 	{
-		Debug.Log($"Eingegebene Ip-Adresse: {_IPAdressField.text}");
-		Debug.Log($"Eingegebener Port: {_PortField.text}");
+		Debug.Log($"Eingegebene Ip-Adresse: {_JoinCodeField.text}");
+		//Debug.Log($"Eingegebener Port: {_PortField.text}");
 
 		//if (IPAddress.TryParse(_IPAdressField.text, out _) && ushort.TryParse(_PortField.text, out ushort Parsed_Port))
 		//{
@@ -245,7 +260,10 @@ public class MainMenu : MonoBehaviour
 
 		//NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(connectionData);
 
-		StartCoroutine(Example_ConfigureTransportAndStartNgoAsConnectingPlayer(_IPAdressField.text));
+
+		_RegionsDropdown.interactable = false;
+
+		StartCoroutine(ConfigureTransportAndStartNgoAsConnectingPlayer(_JoinCodeField.text));
 
 		//NetworkLog.LogInfoServer($"Trying To Connect To Server; Connectiondata: {connectionData}");
 
@@ -273,7 +291,7 @@ public class MainMenu : MonoBehaviour
 		return new RelayServerData(allocation, "dtls");
 	}
 
-	IEnumerator Example_ConfigureTransportAndStartNgoAsConnectingPlayer(string RelayJoinCode)
+	IEnumerator ConfigureTransportAndStartNgoAsConnectingPlayer(string RelayJoinCode)
 	{
 		// Populate RelayJoinCode beforehand through the UI
 		Task<RelayServerData> clientRelayUtilityTask = JoinRelayServerFromJoinCode(RelayJoinCode);
@@ -294,6 +312,7 @@ public class MainMenu : MonoBehaviour
 		NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
 		NetworkManager.Singleton.StartClient();
+		SendClientInformation(_UserNameField.text);
 		yield return null;
 	}
 
@@ -309,6 +328,18 @@ public class MainMenu : MonoBehaviour
 #else
 		Application.Quit();
 #endif
+	}
+
+	[ServerRpc]
+	private void SendClientInformation(string UserName)
+	{
+		_BeigetreneSpielerText.text += UserName;
+	}
+
+	private void UserNameChanged(string value)
+	{
+		_JoinGameMainMenuGameButton.interactable =
+		_HostGameButton.interactable = !string.IsNullOrWhiteSpace(value);
 	}
 
 	public void MasterVolumeChanged(float Volume)
