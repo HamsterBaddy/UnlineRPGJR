@@ -59,17 +59,17 @@ public class PlayerMovement : NetworkBehaviour
 	public NetworkVariable<bool>    notSlide          = new(false, writePerm : NetworkVariableWritePermission.Owner);
 	public NetworkVariable<Vector2> maxSpeed          = new(new Vector2(3, 3), writePerm: NetworkVariableWritePermission.Owner);
 
-	public NetworkVariable<bool> isOld = new(false);
+	public NetworkVariable<bool> isOld = new(false, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<bool> canStomping = new(false, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<bool> isStomping = new(false, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<bool> canJump = new(false, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<float> maxDurationStomp = new(0.6f);
 	public NetworkVariable<float> lastStompActivation = new(-1f, writePerm: NetworkVariableWritePermission.Owner);
 	public NetworkVariable<float> stompStrength = new(32f);
-	public NetworkVariable<float> waterSpeedSlowdownFactor = new(0.75f);
+	public NetworkVariable<float> waterSpeedSlowdownFactor = new(0.5f);
 	public NetworkVariable<bool> isCollidingWithSpikes = new(false, writePerm: NetworkVariableWritePermission.Owner);
 
-	public NetworkVariable<float> runSpeedUpFactor = new(1.25f);
+	public NetworkVariable<float> runSpeedUpFactor = new(1.5f, writePerm: NetworkVariableWritePermission.Owner);
 
 	public static bool useKeyboard = false; 
 
@@ -77,7 +77,7 @@ public class PlayerMovement : NetworkBehaviour
 
 	public Controls controls;
 
-	public bool isInWater;
+	public NetworkVariable<bool> isInWater = new(false, writePerm: NetworkVariableWritePermission.Owner);
 
 	public static ulong oldPlayerClientId;
 
@@ -278,33 +278,45 @@ public class PlayerMovement : NetworkBehaviour
 	void Start()
 	{
 		Debug.Log("Start");
+		rb = gameObject.GetComponent<Rigidbody2D>();
+		rb.gravityScale = gravity.Value;
+		animator = gameObject.GetComponent<Animator>();
 		if (IsOwner)
 		{
 			Debug.Log("is ownser Start");
 
-			rb = gameObject.GetComponent<Rigidbody2D>();
-			rb.gravityScale = gravity.Value;
-			animator = gameObject.GetComponent<Animator>();
 			lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
 		}
 
 		PlayerActiveManager pam = GetComponent<PlayerActiveManager>();
 
-		if (IsHost)
+		if (IsOwnedByServer)
 		{
-			isOld.Value = true;
 			pam.childsprite = oldChildSprite;
 			animator.runtimeAnimatorController = oldAnimController;
 			Destroy(youngChildSprite);
 			Destroy(youngCollision);
+			if (IsOwner)
+			{
+				jumpStrength.Value = 24f;
+				speed.Value = 66f;
+				maxSpeed.Value = new(3f,3f);
+				isOld.Value = true;
+			}
 		}
 		else
 		{
-			isOld.Value = false;
 			pam.childsprite = youngChildSprite;
 			animator.runtimeAnimatorController = youngAnimController;
 			Destroy(oldChildSprite);
 			Destroy(oldCollision);
+			if (IsOwner)
+			{
+				isOld.Value = false;
+				jumpStrength.Value = 32f;
+				speed.Value = 81f;
+				maxSpeed.Value = new(6f, 6f);
+			}
 		}
 
 		pam.setEnableComponents(!pam.noPlayerScenes.Contains(SceneManager.GetActiveScene().name));
@@ -316,23 +328,31 @@ public class PlayerMovement : NetworkBehaviour
 
 	public bool isGroundedMiddle()
 	{
-		if(isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = 0;
-		RaycastHit2D hitMiddle = Physics2D.Raycast(new Vector2(GetComponent<Collider2D>().bounds.center.x, GetComponent<Collider2D>().bounds.center.y - GetComponent<Collider2D>().bounds.extents.y) - new Vector2(0, offset.Value.y), -Vector2.up, distanceRay.Value);
+		if(isInWater.Value) GetComponentInChildren<SpriteRenderer>().sortingOrder = 0;
+		BoxCollider2D coll = GetComponent<BoxCollider2D>();
+		RaycastHit2D hitMiddle = Physics2D.Raycast(new Vector2(coll.bounds.center.x, coll.bounds.min.y) - new Vector2(0, offset.Value.y), Vector2.down, distanceRay.Value);
+
+		if (hitMiddle.collider != null) Debug.Log("Tag: " + hitMiddle.collider.tag + " | distance: " + hitMiddle.distance + " | centroid: " + hitMiddle.centroid.x + ", " + hitMiddle.centroid.y);
+		
 		if (hitMiddle.collider == null || (hitMiddle.collider != null && hitMiddle.collider.tag != "Ground"))
 		{
-			if (isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
+			if (isInWater.Value) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
 			return false;
 		}
+		else if ((hitMiddle.collider != null && hitMiddle.collider.tag == "Ground"))
+		{
+			if (isInWater.Value) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
+			return true;
+		}
 
-		if (isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
-		return true;
+		return false;
 	}
 
 	public bool isGrounded()
     {
 		if (IsOwner)
 		{
-			if (isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = 0;
+			if (isInWater.Value) GetComponentInChildren<SpriteRenderer>().sortingOrder = 0;
 			RaycastHit2D hitLeft = Physics2D.Raycast(new Vector2(GetComponent<Collider2D>().bounds.min.x, GetComponent<Collider2D>().bounds.min.y) - new Vector2(offset.Value.x, offset.Value.y), -Vector2.up, distanceRay.Value);
 			if (hitLeft.collider == null || (hitLeft.collider != null && (hitLeft.collider.tag != "Ground" && hitLeft.collider.tag != "Player")))
 			{
@@ -349,7 +369,7 @@ public class PlayerMovement : NetworkBehaviour
 						//               {
 
 						grounded.Value = false;
-						if (isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
+						if (isInWater.Value) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
 						return false;
 						//               }
 					}
@@ -362,7 +382,7 @@ public class PlayerMovement : NetworkBehaviour
 			//      }
 
 			grounded.Value = true;
-			if (isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
+			if (isInWater.Value) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
 			return true;
 		}
 		else return grounded.Value;
@@ -378,13 +398,15 @@ public class PlayerMovement : NetworkBehaviour
 				canJump.Value = true;
 				if (!isCollidingWithSpikes.Value && isGroundedMiddle())
 				{
-					lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
+					Debug.Log("setLastGround 1");
+					//lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
 				}
 				airtime.Value = -1;
 				lastStompActivation.Value = -1;
 
-				rb.velocity = Vector2.down * stompStrength.Value;
-				rb.inertia = 1;
+				//WAS MACHT DAS HIER?!
+				//rb.velocity = Vector2.down * stompStrength.Value;
+				//rb.inertia = 1;
 
 				AudioManager.Instance.PlaySFX("Jump Landed");
 			}
@@ -462,10 +484,11 @@ public class PlayerMovement : NetworkBehaviour
 			if (isGrounded() && (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Player"))
 			{
 				airtime.Value = Time.realtimeSinceStartup;
-				if (!isCollidingWithSpikes.Value && isGroundedMiddle())
-				{
-					lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
-				}
+				//if (!isCollidingWithSpikes.Value && isGroundedMiddle())    2.99653    -1.534999
+				//{
+				//	Debug.Log("setLastGround 2");
+				//	lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
+				//}
 			}
 		}
 	}
@@ -487,6 +510,7 @@ public class PlayerMovement : NetworkBehaviour
 				lastStompActivation.Value = -1;
 				if (!isCollidingWithSpikes.Value && isGroundedMiddle())
 				{
+					Debug.Log("setLastGround 3");
 					lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
 				}
 			}
@@ -517,7 +541,7 @@ public class PlayerMovement : NetworkBehaviour
 					maxSpeed.Value *= waterSpeedSlowdownFactor.Value;
 					speed.Value *= waterSpeedSlowdownFactor.Value;
 					GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
-					isInWater = true;
+					isInWater.Value = true;
 					animator.speed *= waterSpeedSlowdownFactor.Value;
 				}
 			}
@@ -557,14 +581,14 @@ public class PlayerMovement : NetworkBehaviour
 			{
 				if (!isOld.Value)
 				{
-					if ((collision.ClosestPoint(gameObject.transform.position) - (new Vector2(gameObject.transform.position.x, gameObject.transform.position.y))).x < 0)
-					{
-						gameObject.transform.position = lastGroundPosition.Value - new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
-					}
-					else
-					{
-						gameObject.transform.position = lastGroundPosition.Value + new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
-					}
+					//if ((collision.ClosestPoint(gameObject.transform.position) - (new Vector2(gameObject.transform.position.x, gameObject.transform.position.y))).x < 0)
+					//{
+					//	gameObject.transform.position = lastGroundPosition.Value - new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+					//}
+					//else
+					//{
+					//	gameObject.transform.position = lastGroundPosition.Value + new Vector2(GetComponent<Collider2D>().bounds.size.x, 0);
+					//}
 					//rb.velocity = Vector2.zero;
 				}
 				else
@@ -572,7 +596,7 @@ public class PlayerMovement : NetworkBehaviour
 					maxSpeed.Value /= waterSpeedSlowdownFactor.Value;
 					speed.Value /= waterSpeedSlowdownFactor.Value;
 					GetComponentInChildren<SpriteRenderer>().sortingOrder = 0;
-					isInWater = false;
+					isInWater.Value = false;
 					animator.speed /= waterSpeedSlowdownFactor.Value;
 				}
 			}
@@ -798,7 +822,7 @@ public class PlayerMovement : NetworkBehaviour
 			//else
 			//	animator.SetTrigger("JumpEnd");
 
-			if(rb.velocity.y < 0 && lastStompActivation.Value == -1)
+			if(rb.velocity.y < 0 && lastStompActivation.Value == -1 && !grounded.Value)
 			{
 				if(!(animator.GetCurrentAnimatorStateInfo(0).IsName("Old_FallingLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("Old_FallingRight")))
 				{
@@ -833,6 +857,13 @@ public class PlayerMovement : NetworkBehaviour
 			//animator.SetFloat("StompInput", Convert.ToSingle(isStomping.Value));
 			//animator.SetFloat("RunInput", Convert.ToSingle(RunInput.Value));
 			//animator.SetFloat("Falling", Convert.ToSingle(rb.velocity.y < 0 && lastStompActivation.Value == -1));
+		}
+		else
+		{
+			if(isInWater.Value)
+				GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
+			else
+				GetComponentInChildren<SpriteRenderer>().sortingOrder = 0;
 		}
 	}
 

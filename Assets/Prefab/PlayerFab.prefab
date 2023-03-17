@@ -302,7 +302,7 @@ Animator:
   m_GameObject: {fileID: 4013048534662529579}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 1304a476e8a71e24ea2797441f7c10aa, type: 2}
+  m_Controller: {fileID: 9100000, guid: cda970860d603ee4182aca3593411525, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -339,12 +339,6 @@ MonoBehaviour:
     TriggerNameHash: 819769265
     TransitionIndex: 3
   - Layer: 0
-    OriginatingState: -1899050017
-    DestinationState: 906016668
-    TransitionDuration: 0
-    TriggerNameHash: 1827985537
-    TransitionIndex: 4
-  - Layer: 0
     OriginatingState: -880221687
     DestinationState: -1372196837
     TransitionDuration: 0
@@ -357,12 +351,6 @@ MonoBehaviour:
     TriggerNameHash: 819769265
     TransitionIndex: 3
   - Layer: 0
-    OriginatingState: -880221687
-    DestinationState: -1202606530
-    TransitionDuration: 0
-    TriggerNameHash: 1827985537
-    TransitionIndex: 4
-  - Layer: 0
     OriginatingState: -1965698598
     DestinationState: -1372196837
     TransitionDuration: 0
@@ -374,12 +362,6 @@ MonoBehaviour:
     TransitionDuration: 0
     TriggerNameHash: 819769265
     TransitionIndex: 3
-  - Layer: 0
-    OriginatingState: -1965698598
-    DestinationState: -1202606530
-    TransitionDuration: 0
-    TriggerNameHash: 1827985537
-    TransitionIndex: 4
   - Layer: 0
     OriginatingState: -1856694910
     DestinationState: 2098333573
@@ -393,12 +375,6 @@ MonoBehaviour:
     TriggerNameHash: 819769265
     TransitionIndex: 3
   - Layer: 0
-    OriginatingState: -1856694910
-    DestinationState: 906016668
-    TransitionDuration: 0
-    TriggerNameHash: 1827985537
-    TransitionIndex: 4
-  - Layer: 0
     OriginatingState: -1372196837
     DestinationState: -880221687
     TransitionDuration: 0
@@ -410,12 +386,6 @@ MonoBehaviour:
     TransitionDuration: 0
     TriggerNameHash: 819769265
     TransitionIndex: 2
-  - Layer: 0
-    OriginatingState: -1372196837
-    DestinationState: -1202606530
-    TransitionDuration: 0
-    TriggerNameHash: 1827985537
-    TransitionIndex: 3
   - Layer: 0
     OriginatingState: 2098333573
     DestinationState: -1899050017
@@ -429,12 +399,6 @@ MonoBehaviour:
     TriggerNameHash: 819769265
     TransitionIndex: 2
   - Layer: 0
-    OriginatingState: 2098333573
-    DestinationState: 906016668
-    TransitionDuration: 0
-    TriggerNameHash: 1827985537
-    TransitionIndex: 3
-  - Layer: 0
     OriginatingState: -1241156759
     DestinationState: -880221687
     TransitionDuration: 0
@@ -447,12 +411,6 @@ MonoBehaviour:
     TriggerNameHash: -585419371
     TransitionIndex: 2
   - Layer: 0
-    OriginatingState: -1241156759
-    DestinationState: -1202606530
-    TransitionDuration: 0
-    TriggerNameHash: 819769265
-    TransitionIndex: 3
-  - Layer: 0
     OriginatingState: -1023334634
     DestinationState: -1899050017
     TransitionDuration: 0
@@ -464,24 +422,6 @@ MonoBehaviour:
     TransitionDuration: 0
     TriggerNameHash: -585419371
     TransitionIndex: 2
-  - Layer: 0
-    OriginatingState: -1023334634
-    DestinationState: 906016668
-    TransitionDuration: 0
-    TriggerNameHash: 1827985537
-    TransitionIndex: 3
-  - Layer: 0
-    OriginatingState: -1202606530
-    DestinationState: -880221687
-    TransitionDuration: 0
-    TriggerNameHash: -1838948904
-    TransitionIndex: 0
-  - Layer: 0
-    OriginatingState: 906016668
-    DestinationState: -1899050017
-    TransitionDuration: 0
-    TriggerNameHash: -1838948904
-    TransitionIndex: 0
   m_Animator: {fileID: 4740733343671391540}
 --- !u!61 &8744704582234147301
 BoxCollider2D:
@@ -496,7 +436,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.004866183, y: 0}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -507,7 +447,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.3242122, y: 0.9}
+  m_Size: {x: 0.3, y: 0.9}
   m_EdgeRadius: 0
 --- !u!61 &7437130583211559869
 BoxCollider2D:
@@ -522,7 +462,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.008664638, y: 0.0057764053}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -533,7 +473,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5783203, y: 1.6354079}
+  m_Size: {x: 0.6, y: 1.6}
   m_EdgeRadius: 0
 --- !u!1 &6220280877812028818
 GameObject:
