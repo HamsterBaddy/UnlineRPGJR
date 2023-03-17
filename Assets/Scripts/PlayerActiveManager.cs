@@ -14,8 +14,6 @@ public class PlayerActiveManager : NetworkBehaviour
 	private void Awake()
 	{
 		NetworkManager.Singleton.SceneManager.OnLoadComplete += onSceneLoaded;
-
-		setEnableComponents(!noPlayerScenes.Contains(SceneManager.GetActiveScene().name));
 	}
 
 	public void onSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)

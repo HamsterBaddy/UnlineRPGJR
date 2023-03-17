@@ -5,6 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 //https://gamedevbeginner.com/how-to-jump-in-unity-with-or-without-physics/#jump_unity � jump based on this
 public class PlayerMovement : NetworkBehaviour
@@ -82,6 +83,16 @@ public class PlayerMovement : NetworkBehaviour
 
 	public static ulong youngPlayerClientId;
 
+	public BoxCollider2D oldCollision;
+	public BoxCollider2D youngCollision;
+	public GameObject oldChildSprite;
+	public GameObject youngChildSprite;
+	public RuntimeAnimatorController oldAnimController;
+	public RuntimeAnimatorController youngAnimController;
+
+	public bool falling = false;
+	public bool rising = false;
+
 
 	//public float drag = 5f;
 
@@ -94,31 +105,39 @@ public class PlayerMovement : NetworkBehaviour
 
 		if (!useKeyboard)
 		{
+			controls.Player.Move.started += ctx => Move(ctx.ReadValue<Vector2>());
 			controls.Player.Move.performed += ctx => Move(ctx.ReadValue<Vector2>());
 			controls.Player.Move.canceled += ctx => Move(ctx.ReadValue<Vector2>());
 
-			controls.Player.Jump.performed += ctx => Jump(ctx.ReadValue<float>());
-			controls.Player.Jump.canceled += ctx => Jump(ctx.ReadValue<float>());
+			controls.Player.Jump.started += ctx => Jump(1f);
+			controls.Player.Jump.performed += ctx => Jump(1f);
+			controls.Player.Jump.canceled += ctx => Jump(0f);
 
-			controls.Player.Stomp.performed += ctx => Stomp(ctx.ReadValue<float>());
-			controls.Player.Stomp.canceled += ctx => Stomp(ctx.ReadValue<float>());
+			controls.Player.Stomp.started += ctx => Stomp(1f);
+			controls.Player.Stomp.performed += ctx => Stomp(1f);
+			controls.Player.Stomp.canceled += ctx => Stomp(0f);
 
-			controls.Player.Run.performed += ctx => Run(ctx.ReadValue<float>());
-			controls.Player.Run.canceled += ctx => Run(ctx.ReadValue<float>());
+			controls.Player.Run.started += ctx => Run(1f);
+			controls.Player.Run.performed += ctx => Run(1f);
+			controls.Player.Run.canceled += ctx => Run(0f);
 		}
 		else
 		{
+			controls.PlayerKeyboardOnly.Move.started += ctx => Move(ctx.ReadValue<Vector2>());
 			controls.PlayerKeyboardOnly.Move.performed += ctx => Move(ctx.ReadValue<Vector2>());
 			controls.PlayerKeyboardOnly.Move.canceled += ctx => Move(ctx.ReadValue<Vector2>());
 
-			controls.PlayerKeyboardOnly.Jump.performed += ctx => Jump(ctx.ReadValue<float>());
-			controls.PlayerKeyboardOnly.Jump.canceled += ctx => Jump(ctx.ReadValue<float>());
+			controls.PlayerKeyboardOnly.Jump.started += ctx => Jump(1f);
+			controls.PlayerKeyboardOnly.Jump.performed += ctx => Jump(1f);
+			controls.PlayerKeyboardOnly.Jump.canceled += ctx => Jump(0f);
 
-			controls.PlayerKeyboardOnly.Stomp.performed += ctx => Stomp(ctx.ReadValue<float>());
-			controls.PlayerKeyboardOnly.Stomp.canceled += ctx => Stomp(ctx.ReadValue<float>());
+			controls.PlayerKeyboardOnly.Stomp.started += ctx => Stomp(1f);
+			controls.PlayerKeyboardOnly.Stomp.performed += ctx => Stomp(1f);
+			controls.PlayerKeyboardOnly.Stomp.canceled += ctx => Stomp(0f);
 
-			controls.PlayerKeyboardOnly.Run.performed += ctx => Run(ctx.ReadValue<float>());
-			controls.PlayerKeyboardOnly.Run.canceled += ctx => Run(ctx.ReadValue<float>());
+			controls.PlayerKeyboardOnly.Run.started += ctx => Run(1f);
+			controls.PlayerKeyboardOnly.Run.performed += ctx => Run(1f);
+			controls.PlayerKeyboardOnly.Run.canceled += ctx => Run(0f);
 		}
 
 		if (IsOwner)
@@ -223,14 +242,32 @@ public class PlayerMovement : NetworkBehaviour
 		{
 			if (IsOwner)
 			{
-				RunInput.Value = input;
+				if (RunInput.Value > 0 && input < 0.1)
+				{
+					RunInput.Value = input;
+					animator.speed /= runSpeedUpFactor.Value;
+				}
+				else if(RunInput.Value < 0.1 && input > 0)
+				{
+					RunInput.Value = input;
+					animator.speed *= runSpeedUpFactor.Value;
+				}
 			}
 		}
 		else
 		{
 			if (IsOwner)
 			{
-				RunInput.Value = input;
+				if (RunInput.Value > 0 && input < 0.1)
+				{
+					RunInput.Value = input;
+					animator.speed /= runSpeedUpFactor.Value;
+				}
+				else if (RunInput.Value < 0.1 && input > 0)
+				{
+					RunInput.Value = input;
+					animator.speed *= runSpeedUpFactor.Value;
+				}
 			}
 		}
 	}
@@ -240,7 +277,6 @@ public class PlayerMovement : NetworkBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-
 		Debug.Log("Start");
 		if (IsOwner)
 		{
@@ -252,9 +288,30 @@ public class PlayerMovement : NetworkBehaviour
 			lastGroundPosition.Value = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
 		}
 
+		PlayerActiveManager pam = GetComponent<PlayerActiveManager>();
+
+		if (IsHost)
+		{
+			isOld.Value = true;
+			pam.childsprite = oldChildSprite;
+			animator.runtimeAnimatorController = oldAnimController;
+			Destroy(youngChildSprite);
+			Destroy(youngCollision);
+		}
+		else
+		{
+			isOld.Value = false;
+			pam.childsprite = youngChildSprite;
+			animator.runtimeAnimatorController = youngAnimController;
+			Destroy(oldChildSprite);
+			Destroy(oldCollision);
+		}
+
+		pam.setEnableComponents(!pam.noPlayerScenes.Contains(SceneManager.GetActiveScene().name));
+
 		//initialJumpForce = jumpForce;
 
-	//side.OnValueChanged += onSideChange;
+		//side.OnValueChanged += onSideChange;
 	}
 
 	public bool isGroundedMiddle()
@@ -367,6 +424,8 @@ public class PlayerMovement : NetworkBehaviour
 				else if (isStomping.Value && isOld.Value && (Time.realtimeSinceStartup - lastStompActivation.Value <= maxDurationStomp.Value))
 				{
 					rb.velocity = Vector2.down * stompStrength.Value;
+					if (!(animator.GetCurrentAnimatorStateInfo(0).IsName("Old_StompLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("Old_StompRight")))
+						animator.SetTrigger("StompStart");
 					airtime.Value = Time.realtimeSinceStartup;
 					Debug.Log("here3");
 				}
@@ -459,6 +518,7 @@ public class PlayerMovement : NetworkBehaviour
 					speed.Value *= waterSpeedSlowdownFactor.Value;
 					GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
 					isInWater = true;
+					animator.speed *= waterSpeedSlowdownFactor.Value;
 				}
 			}
 		}
@@ -513,6 +573,7 @@ public class PlayerMovement : NetworkBehaviour
 					speed.Value /= waterSpeedSlowdownFactor.Value;
 					GetComponentInChildren<SpriteRenderer>().sortingOrder = 0;
 					isInWater = false;
+					animator.speed /= waterSpeedSlowdownFactor.Value;
 				}
 			}
 		}
@@ -530,15 +591,23 @@ public class PlayerMovement : NetworkBehaviour
 			if (jumping.Value && rb.velocity.y <= 0)
 			{
 				jumping.Value = false;
+				if ((animator.GetCurrentAnimatorStateInfo(0).IsName("Old_JumpingLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("Old_JumpingRight")))
+				{
+					animator.SetTrigger("JumpEnd");
+				}
+				//rising = false;
+				//animator.SetTrigger("JumpEnd");
 			}
 
-			if (isStomping.Value && rb.velocity.y > 0)
+			if (isStomping.Value && rb.velocity.y >= 0)
 			{
 				isStomping.Value = false;
 			}
 			if (!isStomping.Value && rb.velocity.y <= 0)
 			{
 				lastStompActivation.Value = -1;
+				if ((animator.GetCurrentAnimatorStateInfo(0).IsName("Old_StompLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("Old_StompRight")))
+					animator.SetTrigger("StompEnd");
 			}
 
 			if (airtime.Value != -1)
@@ -688,6 +757,12 @@ public class PlayerMovement : NetworkBehaviour
 			if (canJump.Value && !jumping.Value && grounded.Value && jumpInput.Value != 0)
 			{
 				jumping.Value = true;
+				if (!(animator.GetCurrentAnimatorStateInfo(0).IsName("Old_JumpingLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("Old_JumpingRight")))
+				{
+					animator.SetTrigger("JumpStart");
+				}
+				//rising = true;
+				//animator.SetTrigger("JumpStart");
 				rb.velocity = new(rb.velocity.x, 0);
 				rb.AddForce((Vector2.up * (jumpInput.Value * (jumpStrength.Value /* * (-1 * Physics2D.gravity.y * rb.gravityScale)*/))) /* * Time.deltaTime*/, ForceMode2D.Impulse);
 				AudioManager.Instance.PlaySFX("Jump");
@@ -696,6 +771,8 @@ public class PlayerMovement : NetworkBehaviour
 			if (isOld.Value && canStomping.Value && !grounded.Value && !isStomping.Value && lastStompActivation.Value == -1 && stompInput.Value > 0)
 			{
 				isStomping.Value = true;
+				if(!(animator.GetCurrentAnimatorStateInfo(0).IsName("Old_StompLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("Old_StompRight")))
+					animator.SetTrigger("StompStart");
 				rb.AddForce((Vector2.down * jumpStrength.Value), ForceMode2D.Impulse);
 				lastStompActivation.Value = Time.realtimeSinceStartup;
 			}
@@ -711,11 +788,51 @@ public class PlayerMovement : NetworkBehaviour
 
 			//Debug.Log(jumpTime.Value + " | " + buttonTime.Value + " | " + falling.Value + " | " + jumping.Value);
 
+			//animator.ResetTrigger("FallingStart");
+			//animator.ResetTrigger("FallingEnd");
+			//animator.ResetTrigger("JumpStart");
+			//animator.ResetTrigger("JumpEnd");
+
+			//if (jumping.Value)
+			//	animator.SetTrigger("JumpStart");
+			//else
+			//	animator.SetTrigger("JumpEnd");
+
+			if(rb.velocity.y < 0 && lastStompActivation.Value == -1)
+			{
+				if(!(animator.GetCurrentAnimatorStateInfo(0).IsName("Old_FallingLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("Old_FallingRight")))
+				{
+					//falling = true;
+					animator.SetTrigger("FallingStart");
+				}
+			}
+			else if(animator.GetCurrentAnimatorStateInfo(0).IsName("Old_FallingLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("Old_FallingRight"))
+			{
+				//falling = false;
+				animator.SetTrigger("FallingEnd");
+			}
+
+
+			//if(!grounded.Value && ((animator.GetCurrentAnimatorStateInfo(0).IsName("IdleLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("IdleRight")) && !(animator.GetCurrentAnimatorStateInfo(0).IsName("Old_StompLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("Old_StompRight"))))
+			//	animator.SetTrigger("StompStart");
+
+			//if (rb.velocity.y > 0 && !(animator.GetCurrentAnimatorStateInfo(0).IsName("Old_JumpingLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("Old_JumpingRight")))
+			//{
+			//	//rising = true;
+			//	animator.SetTrigger("JumpStart");
+			//}
+			//else if (rb.velocity.y <= 0 && (animator.GetCurrentAnimatorStateInfo(0).IsName("Old_JumpingLeft") || animator.GetCurrentAnimatorStateInfo(0).IsName("Old_JumpingRight")))
+			//{
+			//	//rising = false;
+			//	animator.SetTrigger("JumpEnd");
+			//}
+
+
 			animator.SetFloat("MoveInputX", moveinput.Value.x);
-			animator.SetFloat("JumpInput", Convert.ToSingle(jumping.Value));
-			animator.SetFloat("StompInput", Convert.ToSingle(isStomping.Value));
-			animator.SetFloat("RunInput", Convert.ToSingle(RunInput.Value));
-			animator.SetFloat("Falling", Convert.ToSingle(rb.velocity.y < 0 && lastStompActivation.Value == -1));
+			//animator.SetFloat("JumpInput", Convert.ToSingle(jumping.Value));
+			//animator.SetFloat("StompInput", Convert.ToSingle(isStomping.Value));
+			//animator.SetFloat("RunInput", Convert.ToSingle(RunInput.Value));
+			//animator.SetFloat("Falling", Convert.ToSingle(rb.velocity.y < 0 && lastStompActivation.Value == -1));
 		}
 	}
 
