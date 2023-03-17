@@ -202,13 +202,14 @@ MonoBehaviour:
   stompStrength:
     m_InternalValue: 32
   waterSpeedSlowdownFactor:
-    m_InternalValue: 0.5
+    m_InternalValue: 0.75
   isCollidingWithSpikes:
     m_InternalValue: 0
   runSpeedUpFactor:
-    m_InternalValue: 1.5
+    m_InternalValue: 1.25
   animator: {fileID: 0}
-  isInWater: 0
+  isInWater:
+    m_InternalValue: 0
   oldCollision: {fileID: 7437130583211559869}
   youngCollision: {fileID: 8744704582234147301}
   oldChildSprite: {fileID: 6220280877812028818}
