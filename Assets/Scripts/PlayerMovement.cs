@@ -70,11 +70,13 @@ public class PlayerMovement : NetworkBehaviour
 
 	public NetworkVariable<float> runSpeedUpFactor = new(1.25f);
 
-	public static bool useKeyboard = true; 
+	public static bool useKeyboard = false; 
 
 	public Animator animator;
 
 	public Controls controls;
+
+	public bool isInWater;
 
 
 
@@ -236,6 +238,7 @@ public class PlayerMovement : NetworkBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
+
 		Debug.Log("Start");
 		if (IsOwner)
 		{
@@ -254,12 +257,15 @@ public class PlayerMovement : NetworkBehaviour
 
 	public bool isGroundedMiddle()
 	{
+		if(isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = 0;
 		RaycastHit2D hitMiddle = Physics2D.Raycast(new Vector2(GetComponent<Collider2D>().bounds.center.x, GetComponent<Collider2D>().bounds.center.y - GetComponent<Collider2D>().bounds.extents.y) - new Vector2(0, offset.Value.y), -Vector2.up, distanceRay.Value);
-		if (hitMiddle.collider == null || (hitMiddle.collider != null && (hitMiddle.collider.tag != "Ground" && hitMiddle.collider.tag != "Player")))
+		if (hitMiddle.collider == null || (hitMiddle.collider != null && hitMiddle.collider.tag != "Ground"))
 		{
+			if (isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
 			return false;
 		}
 
+		if (isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
 		return true;
 	}
 
@@ -267,6 +273,7 @@ public class PlayerMovement : NetworkBehaviour
     {
 		if (IsOwner)
 		{
+			if (isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = 0;
 			RaycastHit2D hitLeft = Physics2D.Raycast(new Vector2(GetComponent<Collider2D>().bounds.min.x, GetComponent<Collider2D>().bounds.min.y) - new Vector2(offset.Value.x, offset.Value.y), -Vector2.up, distanceRay.Value);
 			if (hitLeft.collider == null || (hitLeft.collider != null && (hitLeft.collider.tag != "Ground" && hitLeft.collider.tag != "Player")))
 			{
@@ -281,7 +288,9 @@ public class PlayerMovement : NetworkBehaviour
 						//Debug.Log(resultNumber);
 						//if(resultNumber == 0)
 						//               {
+
 						grounded.Value = false;
+						if (isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
 						return false;
 						//               }
 					}
@@ -294,6 +303,7 @@ public class PlayerMovement : NetworkBehaviour
 			//      }
 
 			grounded.Value = true;
+			if (isInWater) GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
 			return true;
 		}
 		else return grounded.Value;
@@ -445,10 +455,14 @@ public class PlayerMovement : NetworkBehaviour
 				{
 					maxSpeed.Value *= waterSpeedSlowdownFactor.Value;
 					speed.Value *= waterSpeedSlowdownFactor.Value;
+					GetComponentInChildren<SpriteRenderer>().sortingOrder = -1000;
+					isInWater = true;
 				}
 			}
 		}
 	}
+
+	
 
 	private void OnTriggerStay2D(Collider2D collision)
 	{
@@ -495,6 +509,8 @@ public class PlayerMovement : NetworkBehaviour
 				{
 					maxSpeed.Value /= waterSpeedSlowdownFactor.Value;
 					speed.Value /= waterSpeedSlowdownFactor.Value;
+					GetComponentInChildren<SpriteRenderer>().sortingOrder = 0;
+					isInWater = false;
 				}
 			}
 		}

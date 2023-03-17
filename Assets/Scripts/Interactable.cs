@@ -1,18 +1,40 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class Interactable : MonoBehaviour
+public abstract class Interactable : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    protected Controls localPlayerControls;
+	protected GameObject localPlayer;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	private void Awake()
+	{
+		localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
+		localPlayerControls = localPlayer.GetComponent<PlayerMovement>().controls;
+	}
+
+	private void OnTriggerStay2D(Collider2D collision)
+	{
+		if(collision.gameObject.tag == "Player" && collision.gameObject == localPlayer)
+		{
+			if (PlayerMovement.useKeyboard && localPlayerControls.PlayerKeyboardOnly.ReadInteract.IsPressed())
+			{
+				OnInteraction();
+			}
+			else if (localPlayerControls.Player.ReadInteract.IsPressed())
+			{
+				OnInteraction();
+			}
+		}
+	}
+
+	private void OnTriggerExit2D(Collider2D collision)
+	{
+		if (collision.gameObject.tag == "Player" && collision.gameObject == localPlayer)
+		{
+			OnStop();
+		}
+	}
+
+	protected abstract void OnInteraction();
+	protected abstract void OnStop();
 }
