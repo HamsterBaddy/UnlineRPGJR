@@ -4014,7 +4014,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: UnlineJR
+  m_text: "H\xF6hlenparabel"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8651,14 +8651,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 027901adbbf705841a9b8a38a5988f25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Music: []
-  Sfxs: []
+  Music:
+  - name: SomewhatEeerie
+    clip: {fileID: 8300000, guid: 1fe7264b9f61c064eb6b2729c0b1da6d, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: Cave
+    clip: {fileID: 8300000, guid: b14149d35a9164c4f8d50b20eafed6fa, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  Sfxs:
+  - name: Jump
+    clip: {fileID: 8300000, guid: 9dc7f79309c8e9e49bb748c1c06ec190, type: 3}
+    volume: 0.3
+    pitch: 1
+    loop: 0
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: Jump Landed
+    clip: {fileID: 8300000, guid: 9dc7f79309c8e9e49bb748c1c06ec190, type: 3}
+    volume: 0.3
+    pitch: 1
+    loop: 0
+    spatialBlend: 0
+    source: {fileID: 0}
   sceneAudios:
   - sceneName: Lobby
-    name: Linebeck
+    name: SomewhatEeerie
   - sceneName: SideWorld
-    name: Grand Sea
-  areaAudios: []
+    name: Cave
+  areaAudios:
+  - name: Last Riddle
+    maxPosition: {x: 2140, y: 190}
+    minPosition: {x: 164, y: -210}
   battle: 0
   doPlay: 1
   muteAudio: 0
@@ -8669,7 +8700,7 @@ MonoBehaviour:
   audioVolume: 1
   SFXVolume: 0.3
   masterVolume: 1
-  standardSoundTrack: Vulcano
+  standardSoundTrack: Cave
 --- !u!114 &8043588073865034063
 MonoBehaviour:
   m_ObjectHideFlags: 0
