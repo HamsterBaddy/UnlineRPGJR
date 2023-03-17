@@ -20,9 +20,8 @@ using UnityEngine.UI;
 /// <summary>
 /// Enthält die Logik für das Hauptmenü und den Aufbau der Netzwerkverbindung
 /// </summary>
-public class MainMenu : MonoBehaviour
+public class MainMenu : NetworkBehaviour
 {
-
 	[SerializeField] private TMP_InputField _UserNameField;
 
 	[SerializeField] private TMP_InputField _JoinCodeField;
@@ -42,6 +41,9 @@ public class MainMenu : MonoBehaviour
 	[SerializeField] private Slider         _MasterVolumeSlider;
 	[SerializeField] private Slider         _MusicVolumeSlider;
 	[SerializeField] private Slider         _SFXVolumeSlider;
+
+	[SerializeField] private TMP_Text       _InputSchemaText;
+	[SerializeField] private Button         _InputSchemaButton;
 
 	[SerializeField] private TMP_Dropdown   _RegionsDropdown;
 
@@ -69,9 +71,13 @@ public class MainMenu : MonoBehaviour
 		_MusicVolumeSlider.onValueChanged.AddListener(MusicVolumeChanged);
 		_SFXVolumeSlider.onValueChanged.AddListener(SFXVolumeChanged);
 
+		_InputSchemaButton.onClick.AddListener(ChangeControlSchema);
+
 		_MasterVolumeSlider.value = ClientPrefs.GetMasterVolume();
 		_MusicVolumeSlider.value = ClientPrefs.GetMusicVolume();
 		_SFXVolumeSlider.value = ClientPrefs.GetSFXVolume();
+		PlayerMovement.useKeyboard = ClientPrefs.GetControlSchema();
+		UpdateControlSchemaText();
 	}
 
 	private async void Start()
@@ -223,13 +229,10 @@ public class MainMenu : MonoBehaviour
 
 	private void OnClientConnectedCallback(ulong obj)
 	{
-		if (NetworkManager.Singleton.IsServer)
+		if (!NetworkManager.Singleton.IsServer)
 		{
-			//_BeigetreneSpielerText.text += ;
-		}
-		else
-		{
-			_JoinAnswerText.text += "Server Approved Connection";
+			_JoinAnswerText.text = "Successfully Connected To Server";
+			SendClientInformationServerRpc(_UserNameField.text);
 			NetworkLog.LogInfoServer($"Connected On Client {NetworkManager.Singleton.LocalClientId}");
 		}
 	}
@@ -274,7 +277,7 @@ public class MainMenu : MonoBehaviour
 		//_JoinAnswerText.text = connectionData + Environment.NewLine;
 	}
 
-	public static async Task<RelayServerData> JoinRelayServerFromJoinCode(string joinCode)
+	public async Task<RelayServerData> JoinRelayServerFromJoinCode(string joinCode)
 	{
 		JoinAllocation allocation;
 		try
@@ -284,6 +287,7 @@ public class MainMenu : MonoBehaviour
 		catch
 		{
 			Debug.LogError("Relay create join code request failed");
+			_JoinAnswerText.text = "Beim Beitreten ist ein Fehler aufgetreten" + Environment.NewLine + "Wahrscheinlich ist der Beitrittscode ungültig";
 			throw;
 		}
 
@@ -315,7 +319,6 @@ public class MainMenu : MonoBehaviour
 		NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
 		NetworkManager.Singleton.StartClient();
-		SendClientInformation(_UserNameField.text);
 		yield return null;
 	}
 
@@ -333,9 +336,10 @@ public class MainMenu : MonoBehaviour
 #endif
 	}
 
-	[ServerRpc]
-	private void SendClientInformation(string UserName)
+	[ServerRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
+	private void SendClientInformationServerRpc(string UserName)
 	{
+		Debug.Log($"Writing Username {UserName}");
 		_BeigetreneSpielerText.text += UserName;
 	}
 
@@ -350,11 +354,19 @@ public class MainMenu : MonoBehaviour
 		//foreach (KeyValuePair<ulong, NetworkClient> a in NetworkManager.Singleton.ConnectedClients)
 		//	NetworkManager.Singleton.DisconnectClient(a.Value.ClientId, "Der Host hat den Server beendet");
 		NetworkManager.Singleton.Shutdown();
-		//if (NetworkManager.Singleton != null)
-		//{
-		//	Destroy(NetworkManager.Singleton.gameObject);
-		//}
-		//gameObject.AddComponent<NetworkManager>();
+		_JoinCodeTextText.text = "Beitrittscode wird generiert";
+	}
+
+	private void ChangeControlSchema()
+	{
+		PlayerMovement.useKeyboard = !PlayerMovement.useKeyboard;
+		ClientPrefs.SetControlSchema(PlayerMovement.useKeyboard);
+		UpdateControlSchemaText();
+	}
+
+	private void UpdateControlSchemaText()
+	{
+		_InputSchemaText.text = PlayerMovement.useKeyboard ? "Tastatur" : "Controller";
 	}
 
 	private void MasterVolumeChanged(float Volume)
