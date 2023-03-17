@@ -18,7 +18,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
-/// Enthält die Logik für das Hauptmenü und den Aufbau der Netzwerkverbindung
+/// EnthÃ¤lt die Logik fÃ¼r das HauptmenÃ¼ und den Aufbau der Netzwerkverbindung
 /// </summary>
 public class MainMenu : NetworkBehaviour
 {
@@ -59,7 +59,17 @@ public class MainMenu : NetworkBehaviour
 	/// </summary>
 	private void Awake()
 	{
+
+#if UNITY_EDITOR
+		Debug.unityLogger.logEnabled = true;
+#else
+		Debug.unityLogger.logEnabled = false;
+#endif
+
 		_UserNameField.onValueChanged.AddListener(UserNameChanged);
+		_UserNameField.text = "You aren't supposed to see this";
+		_UserNameField.onValueChanged?.Invoke("You aren't supposed to see this");
+		_UserNameField.gameObject.SetActive(false);
 
 		_HostGameButton.onClick.AddListener(HostGame);
 		_JoinGameButton.onClick.AddListener(JoinGame);
@@ -127,7 +137,7 @@ public class MainMenu : NetworkBehaviour
 
 
 	/// <summary>
-	/// Listener für Host-Button
+	/// Listener fÃ¼r Host-Button
 	/// </summary>
 	public void HostGame()
 	{
@@ -249,7 +259,7 @@ public class MainMenu : NetworkBehaviour
 	}
 
 	/// <summary>
-	/// Listener für Scene-Loader nachdem Spierl gejoint ist
+	/// Listener fÃ¼r Scene-Loader nachdem Spierl gejoint ist
 	/// </summary>
 	public void StartGame()
 	{
@@ -269,7 +279,7 @@ public class MainMenu : NetworkBehaviour
 	}
 
 	/// <summary>
-	/// Listener für Join-Button
+	/// Listener fÃ¼r Join-Button
 	/// </summary>
 	public void JoinGame()
 	{
@@ -309,7 +319,7 @@ public class MainMenu : NetworkBehaviour
 		catch
 		{
 			Debug.LogError("Relay create join code request failed");
-			_JoinAnswerText.text = "Beim Beitreten ist ein Fehler aufgetreten" + Environment.NewLine + "Wahrscheinlich ist der Beitrittscode ungültig";
+			_JoinAnswerText.text = "Beim Beitreten ist ein Fehler aufgetreten" + Environment.NewLine + "Wahrscheinlich ist der Beitrittscode ungÃ¼ltig";
 			throw;
 		}
 
@@ -346,11 +356,11 @@ public class MainMenu : NetworkBehaviour
 
 
 	/// <summary>
-	/// Listener für Exit-Button
+	/// Listener fÃ¼r Exit-Button
 	/// </summary>
 	public void ExitGame()
 	{
-		//Wird abhängig davon ausgeführt, ob es im Unity-Editor oder im Build läuft
+		//Wird abhÃ¤ngig davon ausgefÃ¼hrt, ob es im Unity-Editor oder im Build lÃ¤uft
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;
 #else
@@ -405,15 +415,15 @@ public class MainMenu : NetworkBehaviour
 
 	private void MasterVolumeChanged(float Volume)
 	{
-		ClientPrefs.SetMasterVolume(Volume);
+		AudioManager.Instance.setMasterVolume(Volume);
 	}
 
 	private void MusicVolumeChanged(float Volume)
 	{
-		ClientPrefs.SetMusicVolume(Volume);
+		AudioManager.Instance.setVolumeAudioAll(Volume);
 	}
 	private void SFXVolumeChanged(float Volume)
 	{
-		ClientPrefs.SetSFXVolume(Volume);
+		AudioManager.Instance.setVolumeSFXAll(Volume);
 	}
 }
