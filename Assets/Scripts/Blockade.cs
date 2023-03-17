@@ -35,9 +35,12 @@ public class Blockade : MonoBehaviour
 
 	public void OpenBlockade()
 	{
-		gameObject.GetComponent<BoxCollider2D>().enabled = false;
-		animator.SetTrigger("open");
-		isClosed = false;
+		if (isClosed)
+		{
+			gameObject.GetComponent<BoxCollider2D>().enabled = false;
+			animator.SetTrigger("open");
+			isClosed = false;
+		}
 	}
 
 	private void CloseBlockade(object sender, System.EventArgs e)
@@ -47,9 +50,12 @@ public class Blockade : MonoBehaviour
 
 	public void CloseBlockade()
 	{
-		gameObject.GetComponent<BoxCollider2D>().enabled = true;
-		animator.SetTrigger("close");
-		isClosed = true;
+		if (!isClosed)
+		{
+			gameObject.GetComponent<BoxCollider2D>().enabled = true;
+			animator.SetTrigger("close");
+			isClosed = true;
+		}
 	}
 
 	// Update is called once per frame
