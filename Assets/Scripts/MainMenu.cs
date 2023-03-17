@@ -34,6 +34,7 @@ public class MainMenu : MonoBehaviour
 	[SerializeField] private Button         _StartGameButton;
 	[SerializeField] private TMP_Text       _JoinCodeTextText;
 	[SerializeField] private TMP_Text       _BeigetreneSpielerText;
+	[SerializeField] private Button         _BackToMainMenuFromHostingButton;
 
 	[SerializeField] private TMP_Text       _JoinAnswerText;
 	[SerializeField] private Button         _JoinGameButton;
@@ -61,6 +62,8 @@ public class MainMenu : MonoBehaviour
 		_JoinGameButton.onClick.AddListener(JoinGame);
 		_StartGameButton.onClick.AddListener(StartGame);
 		_ExitAppButton.onClick.AddListener(ExitGame);
+
+		_BackToMainMenuFromHostingButton.onClick.AddListener(BackToMainMenuFromHosting);
 
 		_MasterVolumeSlider.onValueChanged.AddListener(MasterVolumeChanged);
 		_MusicVolumeSlider.onValueChanged.AddListener(MusicVolumeChanged);
@@ -342,16 +345,28 @@ public class MainMenu : MonoBehaviour
 		_HostGameButton.interactable = !string.IsNullOrWhiteSpace(value);
 	}
 
-	public void MasterVolumeChanged(float Volume)
+	private void BackToMainMenuFromHosting()
+	{
+		//foreach (KeyValuePair<ulong, NetworkClient> a in NetworkManager.Singleton.ConnectedClients)
+		//	NetworkManager.Singleton.DisconnectClient(a.Value.ClientId, "Der Host hat den Server beendet");
+		NetworkManager.Singleton.Shutdown();
+		//if (NetworkManager.Singleton != null)
+		//{
+		//	Destroy(NetworkManager.Singleton.gameObject);
+		//}
+		//gameObject.AddComponent<NetworkManager>();
+	}
+
+	private void MasterVolumeChanged(float Volume)
 	{
 		ClientPrefs.SetMasterVolume(Volume);
 	}
 
-	public void MusicVolumeChanged(float Volume)
+	private void MusicVolumeChanged(float Volume)
 	{
 		ClientPrefs.SetMusicVolume(Volume);
 	}
-	public void SFXVolumeChanged(float Volume)
+	private void SFXVolumeChanged(float Volume)
 	{
 		ClientPrefs.SetSFXVolume(Volume);
 	}

@@ -251,6 +251,7 @@ MonoBehaviour:
   _StartGameButton: {fileID: 1268267927}
   _JoinCodeTextText: {fileID: 1231098044}
   _BeigetreneSpielerText: {fileID: 1733639284}
+  _BackToMainMenuFromHostingButton: {fileID: 1058768497}
   _JoinAnswerText: {fileID: 1731515873}
   _JoinGameButton: {fileID: 193270723}
   _MasterVolumeSlider: {fileID: 2074828800}
