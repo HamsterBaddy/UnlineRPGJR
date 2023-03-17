@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: -3375235347002625698}
   - component: {fileID: 4740733343671391540}
   - component: {fileID: 1869213022373244407}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: PlayerFab
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -77,6 +77,8 @@ MonoBehaviour:
     m_InternalValue: 0
   stompInput:
     m_InternalValue: 0
+  RunInput:
+    m_InternalValue: 0
   grounded:
     m_InternalValue: 0
   offset:
@@ -117,7 +119,10 @@ MonoBehaviour:
     m_InternalValue: 0.75
   isCollidingWithSpikes:
     m_InternalValue: 0
+  runSpeedUpFactor:
+    m_InternalValue: 1.25
   animator: {fileID: 0}
+  isInWater: 0
 --- !u!50 &7522266606965834433
 Rigidbody2D:
   serializedVersion: 4
@@ -206,7 +211,7 @@ MonoBehaviour:
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   InLocalSpace: 0
-  Interpolate: 1
+  Interpolate: 0
 --- !u!114 &-3375235347002625698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,7 +269,7 @@ GameObject:
   m_Component:
   - component: {fileID: 962302641960155025}
   - component: {fileID: 1688053388644971127}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: ReddishHairRedEyes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -324,8 +329,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1758356535
-  m_SortingLayer: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: b76cf103e12c8fe43a82e1b582b1f920, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

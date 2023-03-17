@@ -20,15 +20,9 @@ public class PlayerActiveManager : NetworkBehaviour
 
 	public void onSceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
 	{
-		if (IsOwner)
-		{
 			Debug.Log($"{sceneName} | {clientId} | {OwnerClientId} | {noPlayerScenes.Contains(sceneName)} | {noPlayerScenes[0]}");
-
-			if (OwnerClientId == clientId)
-			{
-				setEnableComponents(!noPlayerScenes.Contains(sceneName));
-			}
-		}
+			
+			setEnableComponents(!noPlayerScenes.Contains(sceneName));
 	}
 
 	public void setEnableComponents(bool enable)
