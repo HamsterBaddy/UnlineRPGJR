@@ -59,7 +59,17 @@ public class MainMenu : NetworkBehaviour
 	/// </summary>
 	private void Awake()
 	{
+
+#if UNITY_EDITOR
+		Debug.unityLogger.logEnabled = true;
+#else
+		Debug.unityLogger.logEnabled = false;
+#endif
+
 		_UserNameField.onValueChanged.AddListener(UserNameChanged);
+		_UserNameField.text = "You aren't supposed to see this";
+		_UserNameField.onValueChanged?.Invoke("You aren't supposed to see this");
+		_UserNameField.gameObject.SetActive(false);
 
 		_HostGameButton.onClick.AddListener(HostGame);
 		_JoinGameButton.onClick.AddListener(JoinGame);
@@ -405,15 +415,15 @@ public class MainMenu : NetworkBehaviour
 
 	private void MasterVolumeChanged(float Volume)
 	{
-		ClientPrefs.SetMasterVolume(Volume);
+		AudioManager.Instance.setMasterVolume(Volume);
 	}
 
 	private void MusicVolumeChanged(float Volume)
 	{
-		ClientPrefs.SetMusicVolume(Volume);
+		AudioManager.Instance.setVolumeAudioAll(Volume);
 	}
 	private void SFXVolumeChanged(float Volume)
 	{
-		ClientPrefs.SetSFXVolume(Volume);
+		AudioManager.Instance.setVolumeSFXAll(Volume);
 	}
 }
