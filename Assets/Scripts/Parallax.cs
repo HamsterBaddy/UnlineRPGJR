@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//https://youtu.be/zit45k6CUMk
 public class Parallax : MonoBehaviour
 {
 	private float length, startpos;
