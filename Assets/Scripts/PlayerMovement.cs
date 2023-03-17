@@ -726,6 +726,32 @@ public class PlayerMovement : NetworkBehaviour
 	//	gameObject.GetComponent<Rigidbody2D>().gravityScale = Convert.ToInt32(current) * gravity.Value;
 	//}
 
+	public void leverUpdate(Interactable_Lever lever)
+	{
+		Request_Syncronize_ServerRpc(lever.gameObject.name, lever.isPulled);
+	}
+
+	[ServerRpc]
+	public void Request_Syncronize_ServerRpc(string leverName, bool isPulledVar)
+	{
+		Debug.Log("Request Synchronize on Name: " + gameObject.name);
+		onSynchronize_ClientRpc(leverName, isPulledVar);
+	}
+
+	[ClientRpc]
+	public void onSynchronize_ClientRpc(string leverName, bool isPulledVar)
+	{
+		//Array.Find(Music, sound => sound.name == "Oki_Doki!");
+		GameObject lever = Array.Find(GameObject.FindGameObjectsWithTag("Lever"), go => go.name == leverName);
+		Interactable_Lever il = lever.GetComponent<Interactable_Lever>();
+
+		Debug.Log("onSynchronize on Name: " + lever.name);
+		il.isPulled = isPulledVar;
+
+		Debug.Log("LevelPulledRemotely");
+		il.PullLever();
+	}
+
 
 	private void FixedUpdate()
 	{

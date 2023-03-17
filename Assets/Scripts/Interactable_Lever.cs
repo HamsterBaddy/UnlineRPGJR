@@ -16,47 +16,51 @@ public class Interactable_Lever : Interactable
 
 	public event EventHandler OnLeverDeactivation;
 
+	private void Start()
+	{
+		OnLeverActivation += SynchronizeActivation;
+		OnLeverDeactivation += SynchronizeDeactivation;
+	}
+
+	private void SynchronizeDeactivation(object sender, EventArgs e)
+	{
+		localPlayer.GetComponent<PlayerMovement>().leverUpdate(this);
+	}
+
+	private void SynchronizeActivation(object sender, EventArgs e)
+	{
+		localPlayer.GetComponent<PlayerMovement>().leverUpdate(this);
+	}
+
 	protected override void OnInteraction()
 	{
 		if (Time.frameCount - frameLastActivation >= 32)
 		{
 			Debug.Log("LevelPulled");
 			isPulled = !isPulled;
-			if (isPulled)
-			{
-				Debug.Log("isPulled");
-				animator.SetTrigger("isPulled");
-				OnLeverActivation?.Invoke(this,EventArgs.Empty);
-			}
-			else
-			{
-				Debug.Log("isUnPulled");
-				animator.SetTrigger("isUnPulled");
-				OnLeverDeactivation?.Invoke(this, EventArgs.Empty);
-			}
-			frameLastActivation = Time.frameCount;
+			PullLever();
 		}
+	}
+
+	public void PullLever()
+	{
+		if (isPulled)
+		{
+			Debug.Log("isPulled");
+			animator.SetTrigger("isPulled");
+			OnLeverActivation?.Invoke(this, EventArgs.Empty);
+		}
+		else
+		{
+			Debug.Log("isUnPulled");
+			animator.SetTrigger("isUnPulled");
+			OnLeverDeactivation?.Invoke(this, EventArgs.Empty);
+		}
+		frameLastActivation = Time.frameCount;
 	}
 
 	protected override void OnStop()
 	{
 		
-	}
-
-	private void FixedUpdate()
-	{
-		Request_Syncronize_ServerRpc(isPulled);
-	}
-
-	[ServerRpc]
-	public void Request_Syncronize_ServerRpc(bool isPulledVar)
-	{
-		onSynchronize_ClientRpc(isPulledVar);
-	}
-
-	[ClientRpc]
-	public void onSynchronize_ClientRpc(bool isPulledVar)
-	{
-		isPulled = isPulledVar;
 	}
 }

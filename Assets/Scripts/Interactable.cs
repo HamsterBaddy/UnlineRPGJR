@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 
-public abstract class Interactable : NetworkBehaviour
+public abstract class Interactable : MonoBehaviour
 {
     protected Controls localPlayerControls;
 	protected GameObject localPlayer;
