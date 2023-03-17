@@ -7,6 +7,8 @@ TagManager:
   - Ground
   - Spikes
   - Water
+  - Lever
+  - Scroll
   layers:
   - Default
   - TransparentFX

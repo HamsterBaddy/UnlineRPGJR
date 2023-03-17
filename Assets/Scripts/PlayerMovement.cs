@@ -78,7 +78,9 @@ public class PlayerMovement : NetworkBehaviour
 
 	public bool isInWater;
 
+	public static ulong oldPlayerClientId;
 
+	public static ulong youngPlayerClientId;
 
 
 	//public float drag = 5f;
