@@ -37,6 +37,7 @@ public class MainMenu : NetworkBehaviour
 
 	[SerializeField] private TMP_Text       _JoinAnswerText;
 	[SerializeField] private Button         _JoinGameButton;
+	[SerializeField] private Button         _BackToMainMenuFromJoiningButton;
 
 	[SerializeField] private Slider         _MasterVolumeSlider;
 	[SerializeField] private Slider         _MusicVolumeSlider;
@@ -66,6 +67,7 @@ public class MainMenu : NetworkBehaviour
 		_ExitAppButton.onClick.AddListener(ExitGame);
 
 		_BackToMainMenuFromHostingButton.onClick.AddListener(BackToMainMenuFromHosting);
+		_BackToMainMenuFromJoiningButton.onClick.AddListener(BackToMainMenuFromJoining);
 
 		_MasterVolumeSlider.onValueChanged.AddListener(MasterVolumeChanged);
 		_MusicVolumeSlider.onValueChanged.AddListener(MusicVolumeChanged);
@@ -229,10 +231,19 @@ public class MainMenu : NetworkBehaviour
 
 	private void OnClientConnectedCallback(ulong obj)
 	{
-		if (!NetworkManager.Singleton.IsServer)
+		if (NetworkManager.Singleton.IsServer)
+		{
+			if (obj != NetworkManager.LocalClientId)
+			{
+				_BeigetreneSpielerText.text = "Spieler Zwei ist Beigetreten";
+				_StartGameButton.interactable = true;
+			}
+		}
+		else
 		{
 			_JoinAnswerText.text = "Successfully Connected To Server";
-			SendClientInformationServerRpc(_UserNameField.text);
+
+			//SendClientInformationServerRpc(_UserNameField.text);
 			NetworkLog.LogInfoServer($"Connected On Client {NetworkManager.Singleton.LocalClientId}");
 		}
 	}
@@ -243,7 +254,18 @@ public class MainMenu : NetworkBehaviour
 	public void StartGame()
 	{
 		NetworkLog.LogInfoServer("Starting Game");
+
+		SetPlayerAgesClientRPC();
+
 		NetworkManager.Singleton.SceneManager.LoadScene("SideWorld", LoadSceneMode.Single);
+	}
+
+	[ClientRpc]
+	private void SetPlayerAgesClientRPC()
+	{
+		NetworkLog.LogInfo($"Set Player Ages on Client {NetworkManager.Singleton.LocalClientId}");
+		PlayerMovement.oldPlayerClientId = NetworkManager.Singleton.ConnectedClientsIds[0];
+		PlayerMovement.youngPlayerClientId = NetworkManager.Singleton.ConnectedClientsIds[1];
 	}
 
 	/// <summary>
@@ -336,12 +358,12 @@ public class MainMenu : NetworkBehaviour
 #endif
 	}
 
-	[ServerRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
-	private void SendClientInformationServerRpc(string UserName)
-	{
-		Debug.Log($"Writing Username {UserName}");
-		_BeigetreneSpielerText.text += UserName;
-	}
+	//[ServerRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
+	//private void SendClientInformationServerRpc(string UserName)
+	//{
+	//	Debug.Log($"Writing Username {UserName}");
+	//	_BeigetreneSpielerText.text += UserName;
+	//}
 
 	private void UserNameChanged(string value)
 	{
@@ -355,6 +377,18 @@ public class MainMenu : NetworkBehaviour
 		//	NetworkManager.Singleton.DisconnectClient(a.Value.ClientId, "Der Host hat den Server beendet");
 		NetworkManager.Singleton.Shutdown();
 		_JoinCodeTextText.text = "Beitrittscode wird generiert";
+		_BeigetreneSpielerText.text = "Warte auf Spieler";
+		_JoinCodeField.text = string.Empty;
+	}
+
+	private void BackToMainMenuFromJoining()
+	{
+		//foreach (KeyValuePair<ulong, NetworkClient> a in NetworkManager.Singleton.ConnectedClients)
+		//	NetworkManager.Singleton.DisconnectClient(a.Value.ClientId, "Der Host hat den Server beendet");
+		NetworkManager.Singleton.Shutdown();
+		_JoinCodeTextText.text = "Beitrittscode wird generiert";
+		_BeigetreneSpielerText.text = "Warte auf Spieler";
+		_JoinCodeField.text = string.Empty;
 	}
 
 	private void ChangeControlSchema()
