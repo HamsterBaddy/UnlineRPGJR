@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6122583170494199255}
   - component: {fileID: 6856611024214128696}
   - component: {fileID: 7464049037696489957}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 8307975113943460098}
   - component: {fileID: 8307975113943460097}
   - component: {fileID: 8307975113943460096}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -188,7 +188,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8307975114241642235}
   - component: {fileID: 8307975114241642228}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: page
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -273,7 +273,7 @@ GameObject:
   - component: {fileID: 8307975114395683336}
   - component: {fileID: 8307975114395683343}
   - component: {fileID: 8307975114395683342}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: textDisplay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -408,7 +408,7 @@ GameObject:
   - component: {fileID: 8307975114825132193}
   - component: {fileID: 8307975114825132192}
   - component: {fileID: 6732981218562424955}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Scroll
   m_TagString: Scroll
   m_Icon: {fileID: 0}

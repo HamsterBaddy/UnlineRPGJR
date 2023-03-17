@@ -749,7 +749,7 @@ public class PlayerMovement : NetworkBehaviour
 		il.isPulled = isPulledVar;
 
 		Debug.Log("LevelPulledRemotely");
-		il.PullLever();
+		il.PullLever(false);
 	}
 
 

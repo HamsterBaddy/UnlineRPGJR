@@ -23,6 +23,8 @@ public class Blockade : MonoBehaviour
 		{
 			levertoActiavte.OnLeverActivation += OpenBlockade;
 			levertoActiavte.OnLeverDeactivation += CloseBlockade;
+			levertoActiavte.OnLeverActivationRPC += OpenBlockade;
+			levertoActiavte.OnLeverDeactivationRPC += CloseBlockade;
 		}
     }
 
