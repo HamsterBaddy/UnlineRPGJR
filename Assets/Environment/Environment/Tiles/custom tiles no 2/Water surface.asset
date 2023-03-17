@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
+  m_Name: Water surface
+  m_EditorClassIdentifier: 
+  m_AnimatedSprites:
+  - {fileID: 21300000, guid: 2b3f7f9716e8e2a4d8a9ca7359ca018d, type: 3}
+  - {fileID: 21300000, guid: 840aa139c50e80d4f945e5f6e0764fcf, type: 3}
+  - {fileID: 21300000, guid: 4f7bc2ca40ffa7b419f34518fb3ce67d, type: 3}
+  - {fileID: 21300000, guid: 6c4daa18cfcec73489fe19caee69b4fd, type: 3}
+  - {fileID: 21300000, guid: e0601f1556e58db40a56e73119be232e, type: 3}
+  - {fileID: 21300000, guid: 026e99e5e11bab144b17f8b38ec9a350, type: 3}
+  - {fileID: 21300000, guid: 4eed516b77e97f04db761e324ecb547d, type: 3}
+  - {fileID: 21300000, guid: 95268316ae18a81418109de29c6ce1b9, type: 3}
+  m_MinSpeed: 5
+  m_MaxSpeed: 5
+  m_AnimationStartTime: 0
+  m_AnimationStartFrame: 0
+  m_TileColliderType: 2

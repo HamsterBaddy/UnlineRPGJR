@@ -71,13 +71,17 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-#Debug Files
+# Debug Files
 /[Mm]ono[Bb]leeding[Ee]dge
 /OnlineRPGJR_Data
 /OnlineRPGJR_BurstDebugInformation_DoNotShip
+/UnlineJR_Data
+/UnlineJR_BurstDebugInformation_DoNotShip
 /Testbuild
 Assets/Characters.rar.meta
 Assets/Characters.rar
+Assets/Samples
+Samples.meta
 
 # Default ignored files
 /shelf/
@@ -95,3 +99,10 @@ Assets/Characters.rar
 
 
 .idea/
+
+# Archives
+*.rar.meta
+*.rar
+*.zip
+
+.idea/.idea.UnlineRPGJR.dir/.idea/

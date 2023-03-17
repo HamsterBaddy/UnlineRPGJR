@@ -14,39 +14,53 @@ public static class ClientPrefs
 	const string k_MasterVolumeKey = "MasterVolume";
 	const string k_MusicVolumeKey = "MusicVolume";
 	const string k_SFXVolumeKey = "SFXVolume";
-	const string k_ClientGUIDKey = "client_guid";
+	const string k_ClientGUIDKey = "ClientGuid";
+	const string k_ControlPreference = "ControlSchema";
+
+	private const float standardMasterVolume = 1f;
+	private const float standardSFXVolume = 0.3f;
+	private const float standardMusicVolume = 1f;
+
+	private const int standardControlPreference = 1;
 
 	public static float GetMasterVolume()
 	{
-		return PlayerPrefs.GetFloat(k_MasterVolumeKey, AudioManager.Instance.standardMasterVolume);
+		return PlayerPrefs.GetFloat(k_MasterVolumeKey, standardMasterVolume);
 	}
 
 	public static void SetMasterVolume(float volume)
 	{
-		//AudioManager.Instance.setMasterVolume(volume);
 		PlayerPrefs.SetFloat(k_MasterVolumeKey, volume);
 	}
 
 	public static float GetMusicVolume()
 	{
-		return PlayerPrefs.GetFloat(k_MusicVolumeKey, AudioManager.Instance.standardAudioVolume);
+		return PlayerPrefs.GetFloat(k_MusicVolumeKey, standardMusicVolume);
 	}
 
 	public static void SetMusicVolume(float volume)
 	{
-		//AudioManager.Instance.setVolumeAudioAll(volume);
 		PlayerPrefs.SetFloat(k_MusicVolumeKey, volume);
 	}
 
 	public static float GetSFXVolume()
 	{
-		return PlayerPrefs.GetFloat(k_SFXVolumeKey, AudioManager.Instance.standardSFXVolume);
+		return PlayerPrefs.GetFloat(k_SFXVolumeKey, standardSFXVolume);
 	}
 
 	public static void SetSFXVolume(float volume)
 	{
-		//AudioManager.Instance.setVolumeSFXAll(volume);
 		PlayerPrefs.SetFloat(k_SFXVolumeKey, volume);
+	}
+
+	public static bool GetControlSchema()
+	{
+		return PlayerPrefs.GetInt(k_ControlPreference, standardControlPreference) != 0;
+	}
+
+	public static void SetControlSchema(bool controlSchema)
+	{
+		PlayerPrefs.SetInt(k_ControlPreference, controlSchema ? 1 : 0);
 	}
 
 	/// <summary>
