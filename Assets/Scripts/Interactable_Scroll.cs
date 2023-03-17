@@ -4,7 +4,7 @@ using TMPro;
 public class Interactable_Scroll : Interactable
 {
 	public TMP_Text textDisplay;
-	public Canvas canvas;
+	public GameObject canvas;
 
 	private static bool isFirst = true;
 
@@ -16,18 +16,24 @@ public class Interactable_Scroll : Interactable
 
 	protected override void OnInteraction()
 	{
-		if (!canvas.isActiveAndEnabled)
+		if (!canvas.activeSelf)
 		{
 			Debug.Log("ScrollInteraction");
 			textDisplay.text = text;
-			canvas.enabled = true;
+			canvas.SetActive(true);
+		}
+		else if(isFirst)
+		{
+			Debug.Log("ScrollInteraction");
+			textDisplay.text = text;
+			isFirst = false;
 		}
 	}
 
 	protected override void OnStop()
 	{
 		Debug.Log("ScrollStop");
-		canvas.enabled = false;
+		canvas.SetActive(false);
 	}
 
 	private void OnTriggerEnter2D(Collider2D collision)
@@ -37,8 +43,7 @@ public class Interactable_Scroll : Interactable
 			if (isFirst)
 			{
 				textDisplay.text = alternativeText;
-				canvas.enabled = true;
-				isFirst = false;
+				canvas.SetActive(true);
 			}
 		}
 	}

@@ -18,11 +18,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
-/// Enthält die Logik für das Hauptmenü und den Aufbau der Netzwerkverbindung
+/// EnthÃ¤lt die Logik fÃ¼r das HauptmenÃ¼ und den Aufbau der Netzwerkverbindung
 /// </summary>
-public class MainMenu : MonoBehaviour
+public class MainMenu : NetworkBehaviour
 {
-
 	[SerializeField] private TMP_InputField _UserNameField;
 
 	[SerializeField] private TMP_InputField _JoinCodeField;
@@ -34,13 +33,18 @@ public class MainMenu : MonoBehaviour
 	[SerializeField] private Button         _StartGameButton;
 	[SerializeField] private TMP_Text       _JoinCodeTextText;
 	[SerializeField] private TMP_Text       _BeigetreneSpielerText;
+	[SerializeField] private Button         _BackToMainMenuFromHostingButton;
 
 	[SerializeField] private TMP_Text       _JoinAnswerText;
 	[SerializeField] private Button         _JoinGameButton;
+	[SerializeField] private Button         _BackToMainMenuFromJoiningButton;
 
 	[SerializeField] private Slider         _MasterVolumeSlider;
 	[SerializeField] private Slider         _MusicVolumeSlider;
 	[SerializeField] private Slider         _SFXVolumeSlider;
+
+	[SerializeField] private TMP_Text       _InputSchemaText;
+	[SerializeField] private Button         _InputSchemaButton;
 
 	[SerializeField] private TMP_Dropdown   _RegionsDropdown;
 
@@ -55,20 +59,38 @@ public class MainMenu : MonoBehaviour
 	/// </summary>
 	private void Awake()
 	{
+
+#if UNITY_EDITOR
+		Debug.unityLogger.logEnabled = true;
+#else
+		Debug.unityLogger.logEnabled = false;
+#endif
+
 		_UserNameField.onValueChanged.AddListener(UserNameChanged);
+		_UserNameField.text = "You aren't supposed to see this";
+		_UserNameField.onValueChanged?.Invoke("You aren't supposed to see this");
+		_UserNameField.gameObject.SetActive(false);
 
 		_HostGameButton.onClick.AddListener(HostGame);
 		_JoinGameButton.onClick.AddListener(JoinGame);
 		_StartGameButton.onClick.AddListener(StartGame);
 		_ExitAppButton.onClick.AddListener(ExitGame);
 
-		_MasterVolumeSlider.onValueChanged.AddListener(MasterVolumeChanged);
-		_MusicVolumeSlider.onValueChanged.AddListener(MusicVolumeChanged);
-		_SFXVolumeSlider.onValueChanged.AddListener(SFXVolumeChanged);
+		_BackToMainMenuFromHostingButton.onClick.AddListener(BackToMainMenuFromHosting);
+		_BackToMainMenuFromJoiningButton.onClick.AddListener(BackToMainMenuFromJoining);
+
+		_InputSchemaButton.onClick.AddListener(ChangeControlSchema);
 
 		_MasterVolumeSlider.value = ClientPrefs.GetMasterVolume();
 		_MusicVolumeSlider.value = ClientPrefs.GetMusicVolume();
 		_SFXVolumeSlider.value = ClientPrefs.GetSFXVolume();
+		PlayerMovement.useKeyboard = ClientPrefs.GetControlSchema();
+		UpdateControlSchemaText();
+
+
+		_MasterVolumeSlider.onValueChanged.AddListener(MasterVolumeChanged);
+		_MusicVolumeSlider.onValueChanged.AddListener(MusicVolumeChanged);
+		_SFXVolumeSlider.onValueChanged.AddListener(SFXVolumeChanged);
 	}
 
 	private async void Start()
@@ -116,7 +138,7 @@ public class MainMenu : MonoBehaviour
 
 
 	/// <summary>
-	/// Listener für Host-Button
+	/// Listener fÃ¼r Host-Button
 	/// </summary>
 	public void HostGame()
 	{
@@ -222,30 +244,47 @@ public class MainMenu : MonoBehaviour
 	{
 		if (NetworkManager.Singleton.IsServer)
 		{
-			//_BeigetreneSpielerText.text += ;
+			if (obj != NetworkManager.LocalClientId)
+			{
+				_BeigetreneSpielerText.text = "Player Two Joined";
+				_StartGameButton.interactable = true;
+			}
 		}
 		else
 		{
-			_JoinAnswerText.text += "Server Approved Connection";
+			_JoinAnswerText.text = "Successfully Connected To Server";
+
+			//SendClientInformationServerRpc(_UserNameField.text);
 			NetworkLog.LogInfoServer($"Connected On Client {NetworkManager.Singleton.LocalClientId}");
 		}
 	}
 
 	/// <summary>
-	/// Listener für Scene-Loader nachdem Spierl gejoint ist
+	/// Listener fÃ¼r Scene-Loader nachdem Spierl gejoint ist
 	/// </summary>
 	public void StartGame()
 	{
 		NetworkLog.LogInfoServer("Starting Game");
+
+		SetPlayerAgesClientRPC();
+
 		NetworkManager.Singleton.SceneManager.LoadScene("SideWorld", LoadSceneMode.Single);
 	}
 
+	[ClientRpc]
+	private void SetPlayerAgesClientRPC()
+	{
+		NetworkLog.LogInfo($"Set Player Ages on Client {NetworkManager.Singleton.LocalClientId}");
+		PlayerMovement.oldPlayerClientId = NetworkManager.Singleton.ConnectedClientsIds[0];
+		PlayerMovement.youngPlayerClientId = NetworkManager.Singleton.ConnectedClientsIds[1];
+	}
+
 	/// <summary>
-	/// Listener für Join-Button
+	/// Listener fÃ¼r Join-Button
 	/// </summary>
 	public void JoinGame()
 	{
-		Debug.Log($"Eingegebene Ip-Adresse: {_JoinCodeField.text}");
+		Debug.Log($"Entered Join Code: {_JoinCodeField.text}");
 		//Debug.Log($"Eingegebener Port: {_PortField.text}");
 
 		//if (IPAddress.TryParse(_IPAdressField.text, out _) && ushort.TryParse(_PortField.text, out ushort Parsed_Port))
@@ -263,6 +302,7 @@ public class MainMenu : MonoBehaviour
 
 		_RegionsDropdown.interactable = false;
 
+
 		StartCoroutine(ConfigureTransportAndStartNgoAsConnectingPlayer(_JoinCodeField.text));
 
 		//NetworkLog.LogInfoServer($"Trying To Connect To Server; Connectiondata: {connectionData}");
@@ -271,8 +311,13 @@ public class MainMenu : MonoBehaviour
 		//_JoinAnswerText.text = connectionData + Environment.NewLine;
 	}
 
-	public static async Task<RelayServerData> JoinRelayServerFromJoinCode(string joinCode)
+	public async Task<RelayServerData> JoinRelayServerFromJoinCode(string joinCode)
 	{
+		if (UnityServices.State == ServicesInitializationState.Uninitialized)
+		{
+			await UnityServices.InitializeAsync();
+		}
+
 		JoinAllocation allocation;
 		try
 		{
@@ -281,6 +326,7 @@ public class MainMenu : MonoBehaviour
 		catch
 		{
 			Debug.LogError("Relay create join code request failed");
+			_JoinAnswerText.text = "Beim Beitreten ist ein Fehler aufgetreten" + Environment.NewLine + "Wahrscheinlich ist der Beitrittscode ungÃ¼ltig";
 			throw;
 		}
 
@@ -312,17 +358,16 @@ public class MainMenu : MonoBehaviour
 		NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
 		NetworkManager.Singleton.StartClient();
-		SendClientInformation(_UserNameField.text);
 		yield return null;
 	}
 
 
 	/// <summary>
-	/// Listener für Exit-Button
+	/// Listener fÃ¼r Exit-Button
 	/// </summary>
 	public void ExitGame()
 	{
-		//Wird abhängig davon ausgeführt, ob es im Unity-Editor oder im Build läuft
+		//Wird abhÃ¤ngig davon ausgefÃ¼hrt, ob es im Unity-Editor oder im Build lÃ¤uft
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;
 #else
@@ -330,11 +375,12 @@ public class MainMenu : MonoBehaviour
 #endif
 	}
 
-	[ServerRpc]
-	private void SendClientInformation(string UserName)
-	{
-		_BeigetreneSpielerText.text += UserName;
-	}
+	//[ServerRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
+	//private void SendClientInformationServerRpc(string UserName)
+	//{
+	//	Debug.Log($"Writing Username {UserName}");
+	//	_BeigetreneSpielerText.text += UserName;
+	//}
 
 	private void UserNameChanged(string value)
 	{
@@ -342,17 +388,49 @@ public class MainMenu : MonoBehaviour
 		_HostGameButton.interactable = !string.IsNullOrWhiteSpace(value);
 	}
 
-	public void MasterVolumeChanged(float Volume)
+	private void BackToMainMenuFromHosting()
 	{
-		ClientPrefs.SetMasterVolume(Volume);
+		//foreach (KeyValuePair<ulong, NetworkClient> a in NetworkManager.Singleton.ConnectedClients)
+		//	NetworkManager.Singleton.DisconnectClient(a.Value.ClientId, "Der Host hat den Server beendet");
+		NetworkManager.Singleton.Shutdown();
+		_JoinCodeTextText.text = "Join Code is being Generated";
+		_BeigetreneSpielerText.text = "Waiting for Players";
+		_JoinCodeField.text = string.Empty;
 	}
 
-	public void MusicVolumeChanged(float Volume)
+	private void BackToMainMenuFromJoining()
 	{
-		ClientPrefs.SetMusicVolume(Volume);
+		//foreach (KeyValuePair<ulong, NetworkClient> a in NetworkManager.Singleton.ConnectedClients)
+		//	NetworkManager.Singleton.DisconnectClient(a.Value.ClientId, "Der Host hat den Server beendet");
+		NetworkManager.Singleton.Shutdown();
+		_JoinCodeTextText.text = "Join Code is being Generated";
+		_BeigetreneSpielerText.text = "Waiting for Players";
+		_JoinCodeField.text = string.Empty;
 	}
-	public void SFXVolumeChanged(float Volume)
+
+	private void ChangeControlSchema()
 	{
-		ClientPrefs.SetSFXVolume(Volume);
+		PlayerMovement.useKeyboard = !PlayerMovement.useKeyboard;
+		ClientPrefs.SetControlSchema(PlayerMovement.useKeyboard);
+		UpdateControlSchemaText();
+	}
+
+	private void UpdateControlSchemaText()
+	{
+		_InputSchemaText.text = PlayerMovement.useKeyboard ? "Tastatur" : "Controller";
+	}
+
+	private void MasterVolumeChanged(float Volume)
+	{
+		AudioManager.Instance.setMasterVolume(Volume);
+	}
+
+	private void MusicVolumeChanged(float Volume)
+	{
+		AudioManager.Instance.setVolumeAudioAll(Volume);
+	}
+	private void SFXVolumeChanged(float Volume)
+	{
+		AudioManager.Instance.setVolumeSFXAll(Volume);
 	}
 }

@@ -14,11 +14,14 @@ public static class ClientPrefs
 	const string k_MasterVolumeKey = "MasterVolume";
 	const string k_MusicVolumeKey = "MusicVolume";
 	const string k_SFXVolumeKey = "SFXVolume";
-	const string k_ClientGUIDKey = "client_guid";
+	const string k_ClientGUIDKey = "ClientGuid";
+	const string k_ControlPreference = "ControlSchema";
 
 	private const float standardMasterVolume = 1f;
 	private const float standardSFXVolume = 0.3f;
 	private const float standardMusicVolume = 1f;
+
+	private const int standardControlPreference = 1;
 
 	public static float GetMasterVolume()
 	{
@@ -48,6 +51,16 @@ public static class ClientPrefs
 	public static void SetSFXVolume(float volume)
 	{
 		PlayerPrefs.SetFloat(k_SFXVolumeKey, volume);
+	}
+
+	public static bool GetControlSchema()
+	{
+		return PlayerPrefs.GetInt(k_ControlPreference, standardControlPreference) != 0;
+	}
+
+	public static void SetControlSchema(bool controlSchema)
+	{
+		PlayerPrefs.SetInt(k_ControlPreference, controlSchema ? 1 : 0);
 	}
 
 	/// <summary>
